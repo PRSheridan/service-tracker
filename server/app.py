@@ -3,11 +3,13 @@
 # Standard library imports
 
 # Remote library imports
-from flask import make_response, request, session
+from flask import request, session, make_response, send_from_directory
 from flask_restful import Resource
 
 # Local imports
-from config import app, db, api
+#https://medium.com/@brodiea19/flask-sqlalchemy-how-to-upload-photos-and-render-them-to-your-webpage-84aa549ab39e
+import imghdr, uuid
+from config import app, db, api, os
 from models import User, Ticket, Comment, Queue, Tag
 # Add your model imports
 
@@ -18,6 +20,13 @@ from models import User, Ticket, Comment, Queue, Tag
 def index():
     return '<h1>Project Server</h1>'
 
+def validate_image(stream):
+    header = stream.read(512)
+    stream.seek(0)
+    format = imghdr.what(None, header)
+    if not format:
+        return None
+    return "." + (format if format != "jpeg" else "jpg")
 
 class CheckSession(Resource):
     def get(self):
