@@ -57,10 +57,10 @@ class Login(Resource):
     def post(self):
         json = request.get_json()
         username = json.get('username')
-        password = json.get('password')
+        #password = json.get('password')
         user = User.query.filter(User.username == username).first()
 
-        if user and user.authenticate(password):
+        if user: #and user.authenticate(password):
             session['user_id'] = user.id
             return make_response(user.to_dict(), 200)
         
@@ -174,6 +174,57 @@ class TicketByID(Resource):
         db.session.delete(ticket)
         db.session.commit()
         return '', 204
+    
+# TicketByQueueID : get, post, delete
+class TicketByQueueID(Resource):
+    def get(self, queue_id):
+        queue = Queue.query.filter(Queue.id == queue_id).one_or_none()
+        if queue is None:
+            return {'error': 'Queue not found'}, 404
+        
+        tickets = queue.tickets
+        return [ticket.to_dict() for ticket in tickets], 200
+
+    def post(self, queue_id):
+        queue = Queue.query.filter(Queue.id == queue_id).one_or_none()
+        if queue is None:
+            return {'error': 'Queue not found'}, 404
+        data = request.get_json()
+
+        try:
+            new_ticket = Ticket(
+                requestor_id=data['requestor_id'],
+                email=data['email'],
+                phone=data.get('phone'),
+                title=data['title'],
+                description=data['description'],
+                priority=data['priority'],
+                status=data['status']
+            )
+            new_ticket.queues.append(queue)
+            db.session.add(new_ticket)
+            db.session.commit()
+            return new_ticket.to_dict(), 201
+        
+        except Exception as e:
+            return {'error': str(e)}, 400
+
+    def delete(self, queue_id, ticket_id):
+        queue = Queue.query.filter(Queue.id == queue_id).one_or_none()
+        if queue is None:
+            return {'error': 'Queue not found'}, 404
+        
+        ticket = Ticket.query.filter(Ticket.id == ticket_id).one_or_none()
+        if ticket is None:
+            return {'error': 'Ticket not found'}, 404
+        
+        try:
+            ticket.queues.remove(queue)
+            db.session.commit()
+            return '', 204
+        
+        except Exception as e:
+            return {'error': str(e)}, 400
 
 # CommentByID : post, delete
 class CommentByID(Resource):
@@ -248,6 +299,18 @@ class QueueByID(Resource):
         db.session.delete(queue)
         db.session.commit()
         return '', 204
+
+# QueueByUserID : get
+class QueueByUserID(Resource):
+    def get(self):
+        user_id = session.get('user_id')
+        if not user_id:
+            return {'error': 'User not logged in'}, 401
+        user = User.query.filter(User.id == user_id).one_or_none()
+        if user is None:
+            return {'error': 'User not found'}, 404
+        queues = user.queues
+        return [queue.to_dict() for queue in queues], 200
 
 # Tag : get, post
 class Tag(Resource):
@@ -353,9 +416,11 @@ api.add_resource(Logout, '/logout')
 api.add_resource(UserByID, '/user/<int:user_id>')
 api.add_resource(Ticket, '/ticket')
 api.add_resource(TicketByID, '/ticket/<int:ticket_id>')
+api.add_resource(TicketByQueueID, '/queue/<int:queue_id>/ticket/<int:ticket_id>')
 api.add_resource(CommentByID, '/comment/<int:comment_id>')
 api.add_resource(Queue, '/queue')
 api.add_resource(QueueByID, '/queue/<int:queue_id>')
+api.add_resource(QueueByUserID, '/user/queues')
 api.add_resource(Tag, '/tag')
 api.add_resource(TagByID, '/tag/<int:tag_id>')
 api.add_resource(Image, '/image')

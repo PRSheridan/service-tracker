@@ -9,7 +9,7 @@ function LoginForm({ onLogin }) {
   const [isLoading, setIsLoading] = useState(false);
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter username"),
-    password: yup.string().required("Must enter a password"),
+    password: yup.string()//.required("Must enter a password"),
   });
 
   const formik = useFormik({

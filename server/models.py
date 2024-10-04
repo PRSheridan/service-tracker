@@ -9,7 +9,8 @@ from config import db, bcrypt
 # Models go here!
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
-    serialize_rules = ('-password', '-tickets.requestor', '-comments.user')
+
+    serialize_rules = ('-comments.user', '-tickets.requestor', '-queues.users',)
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
@@ -19,6 +20,7 @@ class User(db.Model, SerializerMixin):
     # relationships
     tickets = db.relationship('Ticket', back_populates='requestor', cascade='all, delete-orphan')
     comments = db.relationship('Comment', back_populates='user', cascade='all, delete-orphan')
+    queues = db.relationship('Queue', secondary='user_queues', back_populates='users')
 
     @hybrid_property
     def password_hash(self):
@@ -39,12 +41,11 @@ class User(db.Model, SerializerMixin):
 
 class Ticket(db.Model, SerializerMixin):
     __tablename__ = 'tickets'
-    serialize_rules = ('-requestor.tickets', '-comments.ticket', '-queue.tickets')
+
+    serialize_rules = ('-comments.ticket', '-requestor.tickets', '-queues.tickets',)
 
     id = db.Column(db.Integer, primary_key=True)
     requestor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    queue_id = db.Column(db.Integer, db.ForeignKey('queues.id'), nullable=False)
-
     date = db.Column(db.DateTime, default=datetime.date)
     email = db.Column(db.String(128), nullable=False)
     phone = db.Column(db.String(20), nullable=True)
@@ -57,12 +58,26 @@ class Ticket(db.Model, SerializerMixin):
     requestor = db.relationship('User', back_populates='tickets')
     tags = db.relationship('Tag', secondary='ticket_tags', back_populates='tickets', cascade='all, delete')
     comments = db.relationship('Comment', back_populates='ticket', cascade='all, delete-orphan')
-    queue = db.relationship('Queue', back_populates='tickets')
+    queues = db.relationship('Queue', secondary='ticket_queues', back_populates='tickets')
     images = db.relationship('Image', back_populates='ticket', cascade='all, delete-orphan')
+
+class Queue(db.Model, SerializerMixin):
+    __tablename__ = 'queues'
+
+    serialize_rules = ('-users.queues', '-tickets.queues',)
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True, nullable=False)
+
+    # relationships
+    tickets = db.relationship('Ticket', secondary='ticket_queues', back_populates='queues')
+    tags = db.relationship('Tag', secondary='queue_tags', back_populates='queues', cascade='all, delete')
+    users = db.relationship('User', secondary='user_queues', back_populates='queues')
 
 class Comment(db.Model, SerializerMixin):
     __tablename__ = 'comments'
-    serialize_rules = ('-user.comments', '-ticket.comments')
+
+    serialize_rules = ('-user.comments', '-ticket.comments',)
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -75,20 +90,11 @@ class Comment(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='comments')
     ticket = db.relationship('Ticket', back_populates='comments')
 
-class Queue(db.Model, SerializerMixin):
-    __tablename__ = 'queues'
-    serialize_rules = ('-tickets.queue', '-tags.queues')
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), unique=True, nullable=False)
-
-    # relationships
-    tickets = db.relationship('Ticket', back_populates='queue', cascade='all, delete-orphan')
-    tags = db.relationship('Tag', secondary='queue_tags', back_populates='queues', cascade='all, delete')
 
 class Tag(db.Model, SerializerMixin):
     __tablename__ = 'tags'
-    serialize_rules = ('-tickets.tags', '-queues.tags')
+
+    serialize_rules = ('-tickets.tags', '-queues.tags',)
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32), unique=True, nullable=False)
@@ -99,6 +105,8 @@ class Tag(db.Model, SerializerMixin):
 
 class Image(db.Model, SerializerMixin):
     __tablename__ = 'images'
+
+    serialize_rules = ('-ticket.images',)
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -117,4 +125,14 @@ ticket_tags = db.Table('ticket_tags',
 queue_tags = db.Table('queue_tags',
     db.Column('queue_id', db.Integer, db.ForeignKey('queues.id'), primary_key=True),
     db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True)
+)
+
+user_queues = db.Table('user_queues',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('queue_id', db.Integer, db.ForeignKey('queues.id'), primary_key=True)
+)
+
+ticket_queues = db.Table('ticket_queues',
+    db.Column('ticket_id', db.Integer, db.ForeignKey('tickets.id'), primary_key=True),
+    db.Column('queue_id', db.Integer, db.ForeignKey('queues.id'), primary_key=True)
 )
