@@ -35,13 +35,14 @@ class Signup(Resource):
         json = request.get_json()
         username = json.get('username')
         password = json.get('password')
+        role = "client"
         passwordConfirm = json.get('passwordConfirm')
 
         if password != passwordConfirm:
             return {'error': '401 Passwords do not match'}, 401
 
         try:
-            user = User(username = username)
+            user = User(username = username, role=role)
             user.password_hash = password
 
             db.session.add(user)
@@ -65,21 +66,14 @@ class Login(Resource):
         
         return {'error': '401 Unauthorized login'}, 401
     
-# User : post
-class User(Resource):
-    def post(self):
-        data = request.get_json()
-
-        try:
-            new_user = User(username=data['username'], role=data['role'])
-            new_user.password_hash = data['password']
-            db.session.add(new_user)
-            db.session.commit()
-            return new_user.to_dict(), 201
+class Logout(Resource):
+    def delete(self):
+        if session['user_id']:
+            session['user_id'] = ''
+            return {}, 204
         
-        except Exception as e:
-            return {'error': str(e)}, 400
-
+        return {'error':'401 Unable to process request'}, 401
+    
 # UserByID : get, post, delete
 class UserByID(Resource):
     def get(self, user_id):
@@ -355,7 +349,7 @@ class ImageByID(Resource):
 api.add_resource(CheckSession, '/check_session')
 api.add_resource(Signup, '/signup')
 api.add_resource(Login, '/login')
-api.add_resource(User, '/user')
+api.add_resource(Logout, '/logout')
 api.add_resource(UserByID, '/user/<int:user_id>')
 api.add_resource(Ticket, '/ticket')
 api.add_resource(TicketByID, '/ticket/<int:ticket_id>')
