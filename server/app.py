@@ -26,7 +26,7 @@ def validate_image(stream):
 class CheckSession(Resource):
     def get(self):
         if session['user_id']:
-            user = User.query.filter(User.id == session['user_id']).first().to_dict()
+            user = User.query.filter(User.id == session['user_id']).first()
             return user, 200
         return {'error': '401 Unauthorized Request'}, 401
 

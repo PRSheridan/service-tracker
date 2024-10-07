@@ -24,7 +24,7 @@ function App() {
   return (
     <>
       <div className="header">
-        <div className="title in-line">service-tracker</div>
+        <h1 className="title in-line">service-tracker</h1>
         {user ? <div className="username-display in-line">{user.username}</div> : <></>}
         <NavBar user={user} setUser={setUser}/>
       </div>

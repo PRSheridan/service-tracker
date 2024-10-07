@@ -6,18 +6,38 @@ import datetime
 
 from config import db, bcrypt
 
-# Models go here!
+# Association tables
+ticket_tags = db.Table('ticket_tags',
+    db.Column('ticket_id', db.Integer, db.ForeignKey('tickets.id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True)
+)
+
+ticket_queues = db.Table('ticket_queues',
+    db.Column('ticket_id', db.Integer, db.ForeignKey('tickets.id'), primary_key=True),
+    db.Column('queue_id', db.Integer, db.ForeignKey('queues.id'), primary_key=True)
+)
+
+user_queues = db.Table('user_queues',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('queue_id', db.Integer, db.ForeignKey('queues.id'), primary_key=True)
+)
+
+# User Model
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
-    serialize_rules = ('-comments.user', '-tickets.requestor', '-queues.users',)
+    serialize_rules = (
+        '-tickets',  # Omit tickets to prevent recursion
+        '-comments',  # Omit comments to prevent recursion
+        '-queues',  # Omit queues to prevent recursion
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     _password_hash = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(32), nullable=False)
 
-    # relationships
+    # Relationships
     tickets = db.relationship('Ticket', back_populates='requestor', cascade='all, delete-orphan')
     comments = db.relationship('Comment', back_populates='user', cascade='all, delete-orphan')
     queues = db.relationship('Queue', secondary='user_queues', back_populates='users')
@@ -39,14 +59,22 @@ class User(db.Model, SerializerMixin):
     def __repr__(self):
         return f'<User {self.id, self.username}>'
 
+
+# Ticket Model
 class Ticket(db.Model, SerializerMixin):
     __tablename__ = 'tickets'
 
-    serialize_rules = ('-comments.ticket', '-requestor.tickets', '-queues.tickets',)
+    serialize_rules = (
+        '-requestor',  # Omit the requestor to prevent recursion
+        '-comments',  # Omit comments to prevent recursion
+        '-tags',  # Omit tags to prevent recursion
+        '-queues',  # Omit queues to prevent recursion
+        '-images',  # Omit images to prevent recursion
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     requestor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    date = db.Column(db.DateTime, default=datetime.date)
+    date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     email = db.Column(db.String(128), nullable=False)
     phone = db.Column(db.String(20), nullable=True)
     title = db.Column(db.String(128), nullable=False)
@@ -54,85 +82,79 @@ class Ticket(db.Model, SerializerMixin):
     priority = db.Column(db.String(32), nullable=False)
     status = db.Column(db.String(32), nullable=False)
 
-    # relationships
+    # Relationships
     requestor = db.relationship('User', back_populates='tickets')
     tags = db.relationship('Tag', secondary='ticket_tags', back_populates='tickets', cascade='all, delete')
     comments = db.relationship('Comment', back_populates='ticket', cascade='all, delete-orphan')
     queues = db.relationship('Queue', secondary='ticket_queues', back_populates='tickets')
     images = db.relationship('Image', back_populates='ticket', cascade='all, delete-orphan')
 
+
+# Queue Model
 class Queue(db.Model, SerializerMixin):
     __tablename__ = 'queues'
 
-    serialize_rules = ('-users.queues', '-tickets.queues',)
+    serialize_rules = (
+        '-users',  # Omit users to prevent recursion
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True, nullable=False)
 
-    # relationships
+    # Relationships
     tickets = db.relationship('Ticket', secondary='ticket_queues', back_populates='queues')
-    tags = db.relationship('Tag', secondary='queue_tags', back_populates='queues', cascade='all, delete')
     users = db.relationship('User', secondary='user_queues', back_populates='queues')
 
+
+# Comment Model
 class Comment(db.Model, SerializerMixin):
     __tablename__ = 'comments'
 
-    serialize_rules = ('-user.comments', '-ticket.comments',)
+    serialize_rules = (
+        '-user',  # Omit user to prevent recursion
+        '-ticket',  # Omit ticket to prevent recursion
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     ticket_id = db.Column(db.Integer, db.ForeignKey('tickets.id'), nullable=False)
-
-    date = db.Column(db.DateTime, default=datetime.date)
+    date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     content = db.Column(db.Text, nullable=False)
 
-    # relationships
+    # Relationships
     user = db.relationship('User', back_populates='comments')
     ticket = db.relationship('Ticket', back_populates='comments')
 
 
+# Tag Model
 class Tag(db.Model, SerializerMixin):
     __tablename__ = 'tags'
 
-    serialize_rules = ('-tickets.tags', '-queues.tags',)
+    serialize_rules = (
+        '-tickets',  # Omit tickets to prevent recursion
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32), unique=True, nullable=False)
 
-    # relationships
+    # Relationships
     tickets = db.relationship('Ticket', secondary='ticket_tags', back_populates='tags')
-    queues = db.relationship('Queue', secondary='queue_tags', back_populates='tags')
 
+
+# Image Model
 class Image(db.Model, SerializerMixin):
     __tablename__ = 'images'
 
-    serialize_rules = ('-ticket.images',)
+    serialize_rules = (
+        '-ticket',  # Omit ticket to prevent recursion
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     file_path = db.Column(db.String, nullable=False)
     ticket_id = db.Column(db.Integer, db.ForeignKey('tickets.id'), nullable=False)
 
-    # relationships
+    # Relationships
     ticket = db.relationship('Ticket', back_populates='images')
 
-# Association tables
-ticket_tags = db.Table('ticket_tags',
-    db.Column('ticket_id', db.Integer, db.ForeignKey('tickets.id'), primary_key=True),
-    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True)
-)
 
-queue_tags = db.Table('queue_tags',
-    db.Column('queue_id', db.Integer, db.ForeignKey('queues.id'), primary_key=True),
-    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True)
-)
-
-user_queues = db.Table('user_queues',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('queue_id', db.Integer, db.ForeignKey('queues.id'), primary_key=True)
-)
-
-ticket_queues = db.Table('ticket_queues',
-    db.Column('ticket_id', db.Integer, db.ForeignKey('tickets.id'), primary_key=True),
-    db.Column('queue_id', db.Integer, db.ForeignKey('queues.id'), primary_key=True)
-)

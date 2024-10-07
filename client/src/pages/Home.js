@@ -18,7 +18,7 @@ function Home() {
         <div id="queue-list">
             <div>Home</div>
             { queues.length > 0 ? ( queues.map((queue) => (
-                <QueueDisplay queue={ queue }/>
+                <QueueDisplay key={queue.name} queue={ queue }/>
             ))) : (
                 <>No queues to display</>
             )}
