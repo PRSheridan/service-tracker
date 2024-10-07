@@ -65,7 +65,6 @@ class Ticket(db.Model, SerializerMixin):
     __tablename__ = 'tickets'
 
     serialize_rules = (
-        '-comments',  # Omit comments to prevent recursion
         '-tags',  # Omit tags to prevent recursion
         '-queues',  # Omit queues to prevent recursion
         '-images',  # Omit images to prevent recursion
