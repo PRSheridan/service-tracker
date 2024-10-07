@@ -28,7 +28,6 @@ class User(db.Model, SerializerMixin):
 
     serialize_rules = (
         '-tickets',  # Omit tickets to prevent recursion
-        '-comments',  # Omit comments to prevent recursion
         '-queues',  # Omit queues to prevent recursion
     )
 
@@ -64,11 +63,7 @@ class User(db.Model, SerializerMixin):
 class Ticket(db.Model, SerializerMixin):
     __tablename__ = 'tickets'
 
-    serialize_rules = (
-        '-tags',  # Omit tags to prevent recursion
-        '-queues',  # Omit queues to prevent recursion
-        '-images',  # Omit images to prevent recursion
-    )
+    serialize_rules = ('-queues',)
 
     id = db.Column(db.Integer, primary_key=True)
     requestor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
