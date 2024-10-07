@@ -12,16 +12,16 @@ function NavBar({ setUser }) {
   return (
     <nav id="navbar">
       <NavLink
-        to={{pathname: "/Home"}}
-        className="nav-link"
+        to={{pathname: "/home"}}
+        className="nav-link button"
         >Home
       </NavLink>
       <NavLink
-        to={{pathname: "/Profile"}}
-        className="nav-link"
+        to={{pathname: "/profile"}}
+        className="nav-link button"
         >Profile
       </NavLink>
-      <NavLink className="nav-link" onClick={handleLogoutClick}>
+      <NavLink className="nav-link button" onClick={handleLogoutClick}>
         LOGOUT  
       </NavLink>
     </nav>

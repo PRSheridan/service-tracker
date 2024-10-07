@@ -10,19 +10,19 @@ const routes = [
       element: <App />,
       children: [
         {
-          path: "/Home",
+          path: "/home",
           element: <Home />
         },
         {
-          path: "/Profile",
+          path: "/profile",
           element: <Profile />
         },
         {
-          path: "/Queue",
+          path: "/queue",
           element: <Queue />
         },
         {
-          path: "/Ticket",
+          path: "/ticket/:id",
           element: <Ticket />
         },
       ]

@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext} from "react";
 import { useNavigate } from "react-router-dom";
 
 import QueueDisplay from "../components/QueueDisplay";
+
+const UserContext = createContext()
 
 function Home() {
     const [queues, setQueues] = useState([])
@@ -15,15 +17,15 @@ function Home() {
       }, []);
 
     return (
-        <div id="queue-list">
-            <div>Home</div>
-            { queues.length > 0 ? ( queues.map((queue) => (
-                <QueueDisplay key={queue.name} queue={ queue }/>
-            ))) : (
-                <>No queues to display</>
-            )}
-        </div>
-
+        <UserContext.Provider value={queues}>
+            <div id="queue-list">
+                { queues.length > 0 ? ( queues.map((queue) => (
+                    <QueueDisplay key={queue.name} queue={ queue }/>
+                ))) : (
+                    <>No queues to display</>
+                )}
+            </div>
+        </UserContext.Provider>
     )
 }
 

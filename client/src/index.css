@@ -5,3 +5,58 @@
   --text: hsla(0, 0%, 100%, 0.88);
 }
 
+a {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.button {
+  text-decoration: none;
+  display: inline-block;
+  height: 26px;
+  margin: 5px;
+  background-color: #3b97eeb9;
+  border-width: 0.1px;
+  border-color: #d4d4d473;
+  border-radius: 10px;
+  overflow: hidden;
+  color: #fff;
+  text-align: center;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 15px;
+  box-shadow: 0 1px 1px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 3px 0 rgba(0,0,0,.12);
+  transition: all 0.2s;
+
+  &:hover {
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 4px 3px -2px rgba(0,0,0,.2),0 3px 6px 0 rgba(0,0,0,.12);
+    top: -2px;
+    transform: translateY(-2px);
+    }
+  
+    &:active {
+      box-shadow: 0 0 0 0 rgba(0,0,0,.14),0 0 0 0  rgba(0,0,0,.2),0 0 0 0  rgba(0,0,0,.12);
+      transform: translateY(2px);
+    }
+}
+
+#queue-display {
+  font-size: 20px;
+  width: 30em;
+  margin-bottom: 10px;
+  border-style:dotted;
+  border-top: #282c34;
+  border-left: #282c34;
+  border-right: #282c34;
+}
+
+.ticket-details {
+  display: inline-block;
+  text-align:pretty;
+  margin-right: 10px;
+  margin-bottom: 5px;
+  width: 100px;
+}
+
+.green { background-color: #33df75 }
+
+.blue { background-color: #3b97eeb9 }
