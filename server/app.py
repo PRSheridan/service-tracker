@@ -250,6 +250,24 @@ class CommentByID(Resource):
         db.session.delete(comment)
         db.session.commit()
         return '', 204
+    
+class CommentByTicketID(Resource):
+    def post(self, ticket_id):
+        data = request.get_json()
+
+        try:
+            new_comment = Comment(
+                content=data['content'],
+                user_id=session['user_id'],
+                ticket_id=ticket_id,
+            )
+
+            db.session.add(new_comment)
+            db.session.commit()
+            return new_comment.to_dict(), 201  
+         
+        except Exception as e:
+            return {'error': str(e)}, 400
 
 # Queue : get, post
 class Queue(Resource):
@@ -418,6 +436,7 @@ api.add_resource(Ticket, '/ticket')
 api.add_resource(TicketByID, '/ticket/<int:ticket_id>')
 api.add_resource(TicketByQueueID, '/queue/<int:queue_id>/ticket/<int:ticket_id>')
 api.add_resource(CommentByID, '/comment/<int:comment_id>')
+api.add_resource(CommentByTicketID, '/tickets/<int:ticket_id>/comments')
 api.add_resource(Queue, '/queue')
 api.add_resource(QueueByID, '/queue/<int:queue_id>')
 api.add_resource(QueueByUserID, '/user/queues')

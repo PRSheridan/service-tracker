@@ -104,7 +104,7 @@ class Comment(db.Model, SerializerMixin):
     __tablename__ = 'comments'
 
     serialize_rules = (
-        '-user',  # Omit user to prevent recursion
+        '-user.comments',  # Omit user to prevent recursion
         '-ticket',  # Omit ticket to prevent recursion
     )
 
