@@ -14,6 +14,10 @@ a {
   padding-right: 4px;
 }
 
+.header {
+  margin-left: 5%;
+}
+
 .button {
   text-decoration: none;
   display: inline-block;
@@ -50,9 +54,12 @@ a {
 }
 
 .ticket-list {
-  width: 100%;
+  margin:auto;
+  width: 90%;
   display: flex;
   flex-direction: column;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;;
 }
 
 .queue-display-header {
@@ -83,14 +90,13 @@ a {
 
 .ticket-container {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   padding: 20px;
   font-family: Arial, sans-serif;
 }
 
 .ticket-details {
-  flex: 3;
-  margin-right: 20px;
+  flex: 1;
 }
 
 .ticket-header {
@@ -110,6 +116,17 @@ a {
   padding: 5px 10px;
   border-radius: 5px;
   font-weight: bold;
+}
+
+.ticket-content {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.ticket-main {
+  flex: 3;
+  margin-right: 20px;
 }
 
 .ticket-section {
@@ -154,6 +171,7 @@ a {
   margin-bottom: 10px;
   border-radius: 5px;
   background-color: #f9f9f9;
+  position: relative;
 }
 
 .comments-header {
@@ -174,6 +192,9 @@ a {
 .date {
   color: #7f8c8d;
   font-size: 0.9em;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
 .comment-content {
@@ -181,7 +202,25 @@ a {
   line-height: 1.5;
 }
 
+.new-form textarea {
+  width: 60%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+  resize: vertical; /* Allows the user to resize the textarea vertically */
+}
 
+.new-form .button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.new-form .button {
+  margin-left: 10px;
+}
 
 .green { background-color: #33df75 }
 

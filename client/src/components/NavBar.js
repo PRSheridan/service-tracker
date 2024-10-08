@@ -16,6 +16,11 @@ function NavBar({ setUser }) {
         className="nav-link button"
         >Home
       </NavLink>
+      <NavLink 
+        to={{pathname: "/modify_ticket"}}
+        className="nav-link button">
+        New ticket  
+      </NavLink>
       <NavLink
         to={{pathname: "/profile"}}
         className="nav-link button"

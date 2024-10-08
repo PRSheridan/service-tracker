@@ -3,6 +3,7 @@ import Home from "./pages/Home.js"
 import Profile from "./pages/Profile.js"
 import Queue from "./pages/Queue.js"
 import Ticket from "./pages/Ticket.js"
+import TicketDisplay from "./components/TicketDisplay.js"
 
 const routes = [
     {
@@ -22,8 +23,12 @@ const routes = [
           element: <Queue />
         },
         {
-          path: "/ticket/:id",
+          path: "/modify_ticket",
           element: <Ticket />
+        },
+        {
+          path: "/ticket/:id",
+          element: <TicketDisplay />
         },
       ]
     },

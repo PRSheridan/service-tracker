@@ -111,7 +111,7 @@ class UserByID(Resource):
         return '', 204
 
 # Ticket : get, post
-class Ticket(Resource):
+class TicketIndex(Resource):
     def get(self):
         tickets = Ticket.query.all()
         return [ticket.to_dict() for ticket in tickets], 200
@@ -270,7 +270,7 @@ class CommentByTicketID(Resource):
             return {'error': str(e)}, 400
 
 # Queue : get, post
-class Queue(Resource):
+class QueueIndex(Resource):
     def get(self):
         queues = Queue.query.all()
         return [queue.to_dict() for queue in queues], 200
@@ -331,7 +331,7 @@ class QueueByUserID(Resource):
         return [queue.to_dict() for queue in queues], 200
 
 # Tag : get, post
-class Tag(Resource):
+class TagIndex(Resource):
     def get(self):
         tags = Tag.query.all()
         return [tag.to_dict() for tag in tags], 200
@@ -369,7 +369,7 @@ def validate_image(stream):
         return None
     return "." + (format if format != "jpeg" else "jpg")
 
-class Image(Resource):
+class ImageIndex(Resource):
     def post(self):
         data = request.get_json()
         info = request.form.get("info")
@@ -432,17 +432,17 @@ api.add_resource(Signup, '/signup')
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
 api.add_resource(UserByID, '/user/<int:user_id>')
-api.add_resource(Ticket, '/ticket')
+api.add_resource(TicketIndex, '/ticket')
 api.add_resource(TicketByID, '/ticket/<int:ticket_id>')
 api.add_resource(TicketByQueueID, '/queue/<int:queue_id>/ticket/<int:ticket_id>')
 api.add_resource(CommentByID, '/comment/<int:comment_id>')
 api.add_resource(CommentByTicketID, '/tickets/<int:ticket_id>/comments')
-api.add_resource(Queue, '/queue')
+api.add_resource(QueueIndex, '/queue')
 api.add_resource(QueueByID, '/queue/<int:queue_id>')
 api.add_resource(QueueByUserID, '/user/queues')
-api.add_resource(Tag, '/tag')
+api.add_resource(TagIndex, '/tag')
 api.add_resource(TagByID, '/tag/<int:tag_id>')
-api.add_resource(Image, '/image')
+api.add_resource(ImageIndex, '/image')
 api.add_resource(ImageByID, '/image/<int:image_id>')
 
 if __name__ == '__main__':

@@ -6,22 +6,6 @@ import datetime
 
 from config import db, bcrypt
 
-# Association tables
-ticket_tags = db.Table('ticket_tags',
-    db.Column('ticket_id', db.Integer, db.ForeignKey('tickets.id'), primary_key=True),
-    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True)
-)
-
-ticket_queues = db.Table('ticket_queues',
-    db.Column('ticket_id', db.Integer, db.ForeignKey('tickets.id'), primary_key=True),
-    db.Column('queue_id', db.Integer, db.ForeignKey('queues.id'), primary_key=True)
-)
-
-user_queues = db.Table('user_queues',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('queue_id', db.Integer, db.ForeignKey('queues.id'), primary_key=True)
-)
-
 # User Model
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
@@ -150,4 +134,18 @@ class Image(db.Model, SerializerMixin):
     # Relationships
     ticket = db.relationship('Ticket', back_populates='images')
 
+# Association tables
+ticket_tags = db.Table('ticket_tags',
+    db.Column('ticket_id', db.Integer, db.ForeignKey('tickets.id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True)
+)
 
+ticket_queues = db.Table('ticket_queues',
+    db.Column('ticket_id', db.Integer, db.ForeignKey('tickets.id'), primary_key=True),
+    db.Column('queue_id', db.Integer, db.ForeignKey('queues.id'), primary_key=True)
+)
+
+user_queues = db.Table('user_queues',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('queue_id', db.Integer, db.ForeignKey('queues.id'), primary_key=True)
+)

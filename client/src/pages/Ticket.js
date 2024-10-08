@@ -1,77 +1,114 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState } from 'react';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 
-import CommentForm from "../forms/CommentForm.js"
+function Ticket({ onClose }) {
+    const [errors, setErrors] = useState([]);
 
-function Ticket() {
-    const location = useLocation()
-    const ticket = location.state.ticket
+    //HONESTLY JUST GET THE CURRENT USER AND FILL IN THESE FIELDS?
+    //VERY UNFINISHED ALMOST A DISASTER
 
-    const [showCommentForm, setShowCommentForm] = useState(false)
+    const formSchema = yup.object().shape({
+        requestor_id: yup.number().required("Requestor ID is required"),
+        queue: yup.string().required("Queue is required"),
+        email: yup.string().email("Invalid email format").required("Email is required"),
+        phone: yup.string().nullable(),
+        title: yup.string().required("Title is required"),
+        description: yup.string().required("Description is required"),
+        priority: yup.string().required("Priority is required"),
+        status: yup.string().required("Status is required"),
+    });
+
+    const formik = useFormik({
+        initialValues: {
+            queue: '',
+            email: '',
+            phone: '',
+            title: '',
+            description: '',
+            priority: '',
+        },
+        validationSchema: formSchema,
+        onSubmit: (values) => {
+            fetch('/tickets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(values, null, 1),
+            }).then((response) => {
+                if (response.ok) {
+                    onClose();
+                } else {
+                    response.json().then((err) => setErrors(err.errors));
+                }
+            });
+        },
+    });
 
     return (
-        <div className="ticket-container">
-            <div className="ticket-details">
-                <div className="ticket-header">
-                    <h1>{ticket.title}</h1>
-                    <div className="ticket-status">{ticket.status}</div>
+        <div className="new-form">
+            <div>New Ticket:</div>
+            <form onSubmit={formik.handleSubmit}>
+                <div className="error">{formik.errors.queue}</div>
+                <select
+                    type="text"
+                    id="queue"
+                    autoComplete="off"
+                    value={ formik.values.queue }
+                    onChange={ formik.handleChange }>
+                        <option value="THESE OPTIONS NEED TO BE A LIST OF ALL AVAILABLE QUEUES">THESE OPTIONS NEED TO BE A LIST OF ALL AVAILABLE QUEUES</option>
+                        <option value="owner">owner</option>
+                </select>
+                <div className="error">{formik.errors.email}</div>
+                <input
+                    type="email"
+                    id="email"
+                    autoComplete="off"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                />
+                <div className="error">{formik.errors.phone}</div>
+                <input
+                    type="text"
+                    id="phone"
+                    autoComplete="off"
+                    value={formik.values.phone}
+                    onChange={formik.handleChange}
+                />
+                <div className="error">{formik.errors.title}</div>
+                <input
+                    type="text"
+                    id="title"
+                    autoComplete="off"
+                    value={formik.values.title}
+                    onChange={formik.handleChange}
+                />
+                <div className="error">{formik.errors.description}</div>
+                <textarea
+                    id="description"
+                    autoComplete="off"
+                    value={formik.values.description}
+                    onChange={formik.handleChange}
+                    rows="4"
+                    cols="50"
+                />
+                <div className="error">{formik.errors.priority}</div>
+                <select
+                    type="text"
+                    id="priority"
+                    autoComplete="off"
+                    value={ formik.values.priority }
+                    onChange={ formik.handleChange }>
+                        <option value="THESE OPTIONS NEED TO BE A LIST OF ALL AVAILABLE PRIORITIES">THESE OPTIONS NEED TO BE A LIST OF ALL AVAILABLE PRIORITIES</option>
+                        <option value="owner">owner</option>
+                </select>
+                <div className="button-container">
+                    <button className="button" type="submit">Create Ticket</button>
+                    <button className="button" onClick={() => onClose()}>Cancel</button>
                 </div>
-                <div className="ticket-section">
-                    <h2>Ticket Details</h2>
-                    <p><strong>Ticket ID:</strong> {ticket.id}</p>
-                    <p><strong>Date:</strong> {ticket.date}</p>
-                </div>
-                <div className="ticket-section">
-                    <h2>Actions</h2>
-                    <button className="button ticket-action">Update</button>
-                    <button className="button ticket-action">Delete</button>
-                </div>
-                <div className="ticket-section">
-                    <h2>Priority</h2>
-                    <p>{ticket.priority}</p>
-                </div>
-                <div className="ticket-section">
-                    <h2>Description</h2>
-                    <p>{ticket.description}</p>
-                </div>
-                <div className="ticket-section">
-                    <div className="comments-header">
-                        <h2>Comments</h2>
-                        <button className="button add-comment"
-                                onClick={() => setShowCommentForm(!showCommentForm)}>New comment</button>
-                    </div>
-                    <div className="comment-section">
-                    {showCommentForm ? <CommentForm onClose={() => { setShowCommentForm(false) }}
-                                            ticket={ticket}/> : <></>}
-                        { ticket.comments.length > 0 ? ( ticket.comments.map((comment) => (
-                            <div key={comment.date} className="comment">
-                                <div class="comment-header">
-                                    <span class="username">{ comment.user.username }</span>
-                                    <span class="date">{ comment.date }</span>
-                                </div>
-                                <div class="comment-content">{ comment.content }</div>
-                            </div>
-                        ))) : (
-                            <>No comments to display</>
-                        )}
-                    </div>
-                </div>
-            </div>
-            <div className="sidebar">
-                <div className="requestor-info">
-                    <h2>Requestor Information</h2>
-                    <p><strong>Requestor:</strong> {ticket.requestor.username}</p>
-                    <p><strong>Email:</strong> {ticket.email}</p>
-                    <p><strong>Phone:</strong> {ticket.phone}</p>
-                </div>
-                <div className="ticket-section">
-                    <h2>Images</h2>
-                    <p>{ticket.images}</p>
-                </div>
-            </div>
+                {errors.length > 0 && <div className="alert">{errors.join(', ')}</div>}
+            </form>
         </div>
     );
 }
-
 
 export default Ticket;
