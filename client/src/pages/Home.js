@@ -18,7 +18,7 @@ function Home() {
 
     return (
         <UserContext.Provider value={queues}>
-            <div id="queue-list">
+            <div className="queue-list">
                 { queues.length > 0 ? ( queues.map((queue) => (
                     <QueueDisplay key={queue.name} queue={ queue }/>
                 ))) : (

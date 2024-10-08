@@ -1,20 +1,34 @@
-import React, { useEffect, useState, createContext} from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 
-import TicketDisplay from "../components/TicketDisplay";
-
-function QueueDisplay( {queue} ) {
-
+function QueueDisplay({ queue }) {
+    const navigate = useNavigate();
 
     return (
-        <div id="queue-list">
-            { queue.tickets.length > 0 ? ( queue.tickets.map((ticket) => (
-                <TicketDisplay key={ticket.title} ticket={ ticket }/>
-            ))) : (
+        <div className="ticket-list">
+            <div className="queue-display-header">
+                <div className="ticket-column">Ticket ID</div>
+                <div className="ticket-column">Title</div>
+                <div className="ticket-column">Requestor</div>
+                <div className="ticket-column">Status</div>
+                <div className="ticket-column">Date</div>
+            </div>
+            {queue.tickets.length > 0 ? (
+                queue.tickets.map((ticket) => (
+                    <div key={ticket.id} className="ticket-row"
+                         onClick={() => navigate(`/ticket/${ticket.id}`, {state: {ticket: ticket}})}>
+                        <div className="ticket-cell">{ticket.id}</div>
+                        <div className="ticket-cell">{ticket.title}</div>
+                        <div className="ticket-cell">{ticket.requestor.username}</div>
+                        <div className="ticket-cell">{ticket.status}</div>
+                        <div className="ticket-cell">{ticket.date}</div>
+                    </div>
+                ))
+            ) : (
                 <>No tickets to display</>
             )}
         </div>
-    )
+    );
 }
 
 export default QueueDisplay;
