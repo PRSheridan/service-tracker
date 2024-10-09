@@ -1,45 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-function Ticket({ onClose }) {
-    const [errors, setErrors] = useState([]);
+function Ticket() {
+    const navigate = useNavigate()
+    const {user, setUser} = useOutletContext()
+    const [errors, setErrors] = useState([])
+    const [queues, setQueues] = useState([])
 
-    //HONESTLY JUST GET THE CURRENT USER AND FILL IN THESE FIELDS?
-    //VERY UNFINISHED ALMOST A DISASTER
+    useEffect(() => {
+        fetch(`/queues`)
+          .then(response => response.json())
+          .then(data => {
+            setQueues(data);
+          })
+      }, []);
 
     const formSchema = yup.object().shape({
-        requestor_id: yup.number().required("Requestor ID is required"),
         queue: yup.string().required("Queue is required"),
+        requestor: yup.string().required("Requestor ID is required"),
         email: yup.string().email("Invalid email format").required("Email is required"),
         phone: yup.string().nullable(),
         title: yup.string().required("Title is required"),
         description: yup.string().required("Description is required"),
         priority: yup.string().required("Priority is required"),
-        status: yup.string().required("Status is required"),
     });
 
     const formik = useFormik({
         initialValues: {
             queue: '',
-            email: '',
-            phone: '',
+            requestor: user.username,
+            email: user.email,
+            phone: user.phone,
             title: '',
             description: '',
             priority: '',
         },
         validationSchema: formSchema,
         onSubmit: (values) => {
-            fetch('/tickets', {
+            fetch('/ticket', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(values, null, 1),
             }).then((response) => {
-                if (response.ok) {
-                    onClose();
-                } else {
-                    response.json().then((err) => setErrors(err.errors));
-                }
+                if (response.ok) { navigate("/home" ) }
+                else { response.json().then((err) => setErrors(err.errors)) }
             });
         },
     });
@@ -49,16 +55,28 @@ function Ticket({ onClose }) {
             <div>New Ticket:</div>
             <form onSubmit={formik.handleSubmit}>
                 <div className="error">{formik.errors.queue}</div>
+                <div className="ticket-field">Queue:</div>
                 <select
                     type="text"
                     id="queue"
                     autoComplete="off"
                     value={ formik.values.queue }
                     onChange={ formik.handleChange }>
-                        <option value="THESE OPTIONS NEED TO BE A LIST OF ALL AVAILABLE QUEUES">THESE OPTIONS NEED TO BE A LIST OF ALL AVAILABLE QUEUES</option>
-                        <option value="owner">owner</option>
+                    {queues.map((queue) => (
+                        <option value={queue} key={queue}>{queue}</option>
+                    ))}
                 </select>
+                <div className="error">{formik.errors.requestor}</div>
+                <div className="ticket-field">Requestor:</div>
+                <input
+                    type="text"
+                    id="requestor"
+                    autoComplete="off"
+                    value={formik.values.requestor}
+                    onChange={formik.handleChange}
+                />
                 <div className="error">{formik.errors.email}</div>
+                <div className="ticket-field">Email:</div>
                 <input
                     type="email"
                     id="email"
@@ -67,6 +85,7 @@ function Ticket({ onClose }) {
                     onChange={formik.handleChange}
                 />
                 <div className="error">{formik.errors.phone}</div>
+                <div className="ticket-field">Phone:</div>
                 <input
                     type="text"
                     id="phone"
@@ -75,6 +94,7 @@ function Ticket({ onClose }) {
                     onChange={formik.handleChange}
                 />
                 <div className="error">{formik.errors.title}</div>
+                <div className="ticket-field">Title:</div>
                 <input
                     type="text"
                     id="title"
@@ -83,6 +103,7 @@ function Ticket({ onClose }) {
                     onChange={formik.handleChange}
                 />
                 <div className="error">{formik.errors.description}</div>
+                <div className="ticket-field">Description:</div>
                 <textarea
                     id="description"
                     autoComplete="off"
@@ -92,20 +113,21 @@ function Ticket({ onClose }) {
                     cols="50"
                 />
                 <div className="error">{formik.errors.priority}</div>
+                <div className="ticket-field">Priority:</div>
                 <select
                     type="text"
                     id="priority"
                     autoComplete="off"
                     value={ formik.values.priority }
                     onChange={ formik.handleChange }>
-                        <option value="THESE OPTIONS NEED TO BE A LIST OF ALL AVAILABLE PRIORITIES">THESE OPTIONS NEED TO BE A LIST OF ALL AVAILABLE PRIORITIES</option>
-                        <option value="owner">owner</option>
+                        <option value="low">low</option>
+                        <option value="mid">mid</option>
+                        <option value="high">high</option>
                 </select>
                 <div className="button-container">
                     <button className="button" type="submit">Create Ticket</button>
-                    <button className="button" onClick={() => onClose()}>Cancel</button>
+                    <button className="button" onClick={ () => navigate("/home" ) }>Cancel</button>
                 </div>
-                {errors.length > 0 && <div className="alert">{errors.join(', ')}</div>}
             </form>
         </div>
     );

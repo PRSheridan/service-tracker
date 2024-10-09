@@ -35,6 +35,8 @@ if __name__ == '__main__':
         for _ in range(3):
             user = User(
                 username=fake.user_name(),
+                email=fake.email(),
+                phone=fake.phone_number(),
                 _password_hash="test",  # Assigning password directly
                 role=choice(['admin', 'user'])
             )

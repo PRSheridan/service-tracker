@@ -68,6 +68,12 @@ a {
   font-weight: bold;
 }
 
+.queue-display-name {
+  font-weight: 500;
+  font-size: 26px;
+  margin: 10px;
+}
+
 .ticket-row {
   display: flex;
   border-bottom: 1px solid #ddd;

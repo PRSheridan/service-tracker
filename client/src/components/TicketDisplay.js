@@ -7,15 +7,21 @@ function TicketDisplay() {
     const navigate = useNavigate()
     const location = useLocation()
     const ticket = location.state.ticket
-
     const [showCommentForm, setShowCommentForm] = useState(false)
+    const [comments, setComments] = useState(ticket.comments);
+
+    useEffect(() => {
+        fetch(`/tickets/${ticket.id}/comments`)
+            .then(response => response.json())
+            .then(data => setComments(data));
+    }, [showCommentForm]);
 
     function deleteTicket() {
         fetch(`/ticket/${ticket.id}`, {
             method: 'DELETE',
             headers: { 'Content-Type':'application/json' }
         }).then((response) => {
-            if (response.ok) { navigate("/home" )}
+            if (response.ok) { navigate("/home" ) }
         })
     }
 
@@ -48,19 +54,21 @@ function TicketDisplay() {
                                 <button className="button add-comment" onClick={() => setShowCommentForm(!showCommentForm)}>New comment</button>
                             </div>
                             <div className="comment-section">
-                                {showCommentForm ? <CommentForm onClose={() => { setShowCommentForm(false) }} ticket={ticket}/> : <></>}
-                                { ticket.comments.length > 0 ? ( ticket.comments
-                                    .slice()
-                                    .sort((a, b) => new Date(b.date) - new Date(a.date))
-                                    .map((comment) => (
-                                    <div key={comment.content} className="comment">
-                                        <div className="comment-header">
-                                            <span className="username">{ comment.user.username }</span>
-                                            <span className="date">{ comment.date }</span>
-                                        </div>
-                                        <div className="comment-content">{ comment.content }</div>
-                                    </div>
-                                ))) : (
+                                {showCommentForm ? <CommentForm onClose={() => { setShowCommentForm(false); }} ticket={ticket} /> : <></>}
+                                {comments.length > 0 ? (
+                                    comments
+                                        .slice()
+                                        .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                        .map((comment) => (
+                                            <div key={comment.id} className="comment">
+                                                <div className="comment-header">
+                                                    <span className="username">{comment.user.username}</span>
+                                                    <span className="date">{comment.date}</span>
+                                                </div>
+                                                <div className="comment-content">{comment.content}</div>
+                                            </div>
+                                        ))
+                                ) : (
                                     <>No comments to display</>
                                 )}
                             </div>
@@ -81,8 +89,7 @@ function TicketDisplay() {
                 </div>
             </div>
         </div>
-    );    
+    );
 }
-
 
 export default TicketDisplay;

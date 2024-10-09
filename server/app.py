@@ -3,13 +3,14 @@ import imghdr, uuid, os
 from flask import request, session, make_response, send_from_directory
 from flask_restful import Resource
 from werkzeug.utils import secure_filename
+import datetime
 
 # Local imports
 #https://medium.com/@brodiea19/flask-sqlalchemy-how-to-upload-photos-and-render-them-to-your-webpage-84aa549ab39e
 #https://www.w3schools.com/react/react_usecontext.asp
 
 from config import app, db, api
-from models import User, Ticket, Comment, Queue, Tag
+from models import User, Ticket, Comment, Queue, Tag, Image, ticket_queues
 
 @app.route('/')
 def index():
@@ -118,20 +119,24 @@ class TicketIndex(Resource):
 
     def post(self):
         data = request.get_json()
+        print(data)
 
         try:
             new_ticket = Ticket(
-                requestor_id=data['requestor_id'],
-                queue_id=data['queue_id'],
+                requestor_id=User.query.filter(User.username == data['requestor']).first().id,
+                date=datetime.datetime.utcnow(),
                 email=data['email'],
-                phone=data.get('phone'),
+                phone=data['phone'],
                 title=data['title'],
                 description=data['description'],
                 priority=data['priority'],
-                status=data['status']
+                status='new'
             )
+            new_ticket.queues.append(Queue.query.filter(Queue.name == data['queue']).first())
+
             db.session.add(new_ticket)
             db.session.commit()
+
             return new_ticket.to_dict(), 201
         
         except Exception as e:
@@ -252,6 +257,13 @@ class CommentByID(Resource):
         return '', 204
     
 class CommentByTicketID(Resource):
+    def get(self, ticket_id):
+        comments = Ticket.query.filter(Ticket.id == ticket_id).first().comments
+        if comments is None:
+            return {'error': 'No comments found'}, 404
+        
+        return [comment.to_dict() for comment in comments], 200
+
     def post(self, ticket_id):
         data = request.get_json()
 
@@ -272,8 +284,8 @@ class CommentByTicketID(Resource):
 # Queue : get, post
 class QueueIndex(Resource):
     def get(self):
-        queues = Queue.query.all()
-        return [queue.to_dict() for queue in queues], 200
+        queues = [queue.name for queue in Queue.query.all()]
+        return queues, 200
 
     def post(self):
         data = request.get_json()
@@ -437,7 +449,7 @@ api.add_resource(TicketByID, '/ticket/<int:ticket_id>')
 api.add_resource(TicketByQueueID, '/queue/<int:queue_id>/ticket/<int:ticket_id>')
 api.add_resource(CommentByID, '/comment/<int:comment_id>')
 api.add_resource(CommentByTicketID, '/tickets/<int:ticket_id>/comments')
-api.add_resource(QueueIndex, '/queue')
+api.add_resource(QueueIndex, '/queues')
 api.add_resource(QueueByID, '/queue/<int:queue_id>')
 api.add_resource(QueueByUserID, '/user/queues')
 api.add_resource(TagIndex, '/tag')
