@@ -41,6 +41,8 @@ function TicketDisplay() {
         });
     }
 
+    //ADD QUEUE NEEDS TO BE ADDED
+
     console.log(queues)
 
 
