@@ -171,6 +171,69 @@ a {
   margin: 5px 0;
 }
 
+.queues-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-left: 10px;
+}
+
+.queue-bubble {
+  background-color: #e0f7fa;
+  border: 1px solid #00796b;
+  border-radius: 15px;
+  padding: 10px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.3s;
+}
+
+.queue-bubble:hover {
+  background-color: #b2ebf2;
+}
+
+.new-queue {
+  background-color: #ffffff;
+  border: 1px dashed #00796b; 
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  width: 100%; 
+}
+
+.new-queue input {
+  border: none; 
+  outline: none;
+  flex: 1; 
+  padding: 5px; 
+}
+
+.new-queue button {
+  background-color: #00796b; 
+  color: white; 
+  border: none; 
+  border-radius: 5px; 
+  padding: 5px 10px;
+  margin-left: 10px; 
+  cursor: pointer; 
+}
+
+.new-queue button:hover {
+  background-color: #004d40; 
+}
+
+.delete-queue {
+  background-color: transparent; 
+  color: #e57373;
+  border: none; 
+  cursor: pointer; 
+}
+
+.delete-queue:hover {
+  text-decoration: underline; 
+}
+
 .comment {
   border: 1px solid #ccc;
   padding: 10px;

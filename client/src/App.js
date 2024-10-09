@@ -4,11 +4,9 @@ import NavBar from "./components/NavBar.js"
 import Login from "./pages/Login.js"
 
 function App() {
-  const navigate = useNavigate()
   const [user, setUser] = useState(null)
+  const navigate = useNavigate()
 
-//check if there is a user session in cookies
-//assign user, and redirect to /CalendarList
   useEffect(() => {
     document.title = 'service-tracker'
     fetch("/check_session")

@@ -158,13 +158,6 @@ class TicketByID(Resource):
         data = request.get_json()
 
         try:
-            if 'queue_id' in data:
-                queue = Queue.query.filter(Queue.id == data['queue_id']).one_or_none()
-                if queue is None:
-                    return {'error': 'Queue not found'}, 404
-                if queue not in ticket.queues:
-                    ticket.queues.append(queue)
-
             ticket.requestor_id = data.get('requestor_id', ticket.requestor_id)
             ticket.email = data.get('email', ticket.email)
             ticket.phone = data.get('phone', ticket.phone)
@@ -264,7 +257,7 @@ class CommentByID(Resource):
         db.session.commit()
         return '', 204
     
-class CommentByTicketID(Resource):
+class CommentsByTicketID(Resource):
     def get(self, ticket_id):
         comments = Ticket.query.filter(Ticket.id == ticket_id).first().comments
         if comments is None:
@@ -286,6 +279,25 @@ class CommentByTicketID(Resource):
             db.session.commit()
             return new_comment.to_dict(), 201  
          
+        except Exception as e:
+            return {'error': str(e)}, 400
+
+class QueueByTicketID(Resource):
+    def delete(self, ticket_id, queue_id):
+        print(ticket_id, queue_id)
+        queue = Queue.query.filter(Queue.id == queue_id).one_or_none()
+        if queue is None:
+            return {'error': 'Queue not found'}, 404
+        
+        ticket = Ticket.query.filter(Ticket.id == ticket_id).one_or_none()
+        if ticket is None:
+            return {'error': 'Ticket not found'}, 404
+        
+        try:
+            ticket.queues.remove(queue)
+            db.session.commit()
+            return '', 204
+        
         except Exception as e:
             return {'error': str(e)}, 400
 
@@ -451,17 +463,23 @@ api.add_resource(CheckSession, '/check_session')
 api.add_resource(Signup, '/signup')
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
+
 api.add_resource(UserByID, '/user/<int:user_id>')
+
 api.add_resource(TicketIndex, '/ticket')
 api.add_resource(TicketByID, '/ticket/<int:ticket_id>')
-api.add_resource(TicketByQueueID, '/queue/<int:queue_id>/ticket/<int:ticket_id>')
+
 api.add_resource(CommentByID, '/comment/<int:comment_id>')
-api.add_resource(CommentByTicketID, '/tickets/<int:ticket_id>/comments')
+api.add_resource(CommentsByTicketID, '/tickets/<int:ticket_id>/comments')
+
+api.add_resource(QueueByTicketID, '/ticket/<int:ticket_id>/queue/<int:queue_id>')
 api.add_resource(QueueIndex, '/queues')
 api.add_resource(QueueByID, '/queue/<int:queue_id>')
 api.add_resource(QueueByUserID, '/user/queues')
+
 api.add_resource(TagIndex, '/tag')
 api.add_resource(TagByID, '/tag/<int:tag_id>')
+
 api.add_resource(ImageIndex, '/image')
 api.add_resource(ImageByID, '/image/<int:image_id>')
 

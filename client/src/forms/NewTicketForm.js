@@ -4,11 +4,11 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 function NewTicketForm() {
-    const navigate = useNavigate()
-    const {user, setUser} = useOutletContext()
-
     const [errors, setErrors] = useState([])
     const [queues, setQueues] = useState([])
+    
+    const navigate = useNavigate()
+    const {user, setUser} = useOutletContext()
 
     useEffect(() => {
         fetch(`/queues`)

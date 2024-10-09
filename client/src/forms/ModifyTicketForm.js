@@ -4,23 +4,12 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 function ModifyTicketForm() {
+    const [errors, setErrors] = useState([])
     const navigate = useNavigate()
     const location = useLocation()
     const ticket = location.state.ticket
-    
-    const [errors, setErrors] = useState([])
-    const [queues, setQueues] = useState([])
-
-    useEffect(() => {
-        fetch(`/queues`)
-          .then(response => response.json())
-          .then(data => {
-            setQueues(data);
-          })
-      }, []);
 
     const formSchema = yup.object().shape({
-        queue: yup.string().required("Queue is required"),
         requestor: yup.string().required("Requestor ID is required"),
         email: yup.string().email("Invalid email format").required("Email is required"),
         phone: yup.string().nullable(),
@@ -31,7 +20,6 @@ function ModifyTicketForm() {
 
     const formik = useFormik({
         initialValues: {
-            queue: '',
             requestor: ticket.requestor.username,
             email: ticket.email,
             phone: ticket.phone,
@@ -54,20 +42,8 @@ function ModifyTicketForm() {
 
     return (
         <div className="new-form">
-            <div>New Ticket:</div>
+            <div>Update ticket:</div>
             <form onSubmit={formik.handleSubmit}>
-                <div className="error">{formik.errors.queue}</div>
-                <div className="ticket-field">Queue:</div>
-                <select
-                    type="text"
-                    id="queue"
-                    autoComplete="off"
-                    value={ formik.values.queue }
-                    onChange={ formik.handleChange }>
-                    {queues.map((queue) => (
-                        <option value={queue} key={queue}>{queue}</option>
-                    ))}
-                </select>
                 <div className="error">{formik.errors.requestor}</div>
                 <div className="ticket-field">Requestor:</div>
                 <input

@@ -4,9 +4,10 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 
 function SignupForm({ onLogin }) {
-  const navigate = useNavigate();
-  const [errors, setErrors] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+
+  const navigate = useNavigate()
 
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter username"),

@@ -9,6 +9,7 @@ function TicketDisplay() {
     const [showCommentForm, setShowCommentForm] = useState(false)
     const [ticket, setTicket] = useState(location.state.ticket)
     const [comments, setComments] = useState(ticket.comments);
+    const [queues, setQueues] = useState([])
 
     useEffect(() => {
         fetch(`/ticket/${ticket.id}`)
@@ -16,6 +17,7 @@ function TicketDisplay() {
             .then(data => {
                 setTicket(data)
                 setComments(data.comments)
+                setQueues(data.queues)
             });
     }, [ticket.id, showCommentForm]);
 
@@ -27,6 +29,20 @@ function TicketDisplay() {
             if (response.ok) { navigate("/home" ) }
         })
     }
+
+    function deleteQueue(queue_id) {
+        fetch(`/ticket/${ticket.id}/queue/${queue_id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        }).then((response) => {
+            if (response.ok) {
+                setQueues(queues.filter(queue => queue.id !== queue_id));
+            }
+        });
+    }
+
+    console.log(queues)
+
 
     return (
         <div className="ticket-container">
@@ -45,6 +61,22 @@ function TicketDisplay() {
                             
                             <button className="button ticket-action" 
                                     onClick={() => deleteTicket()}>Delete</button>
+                        </div>
+                        <div className="ticket-section">
+                            <h2>Queues</h2>
+                            <div className="queues-container">
+                                {queues.map(queue => (
+                                    <div key={queue.id} className="queue-bubble">
+                                        {queue.name}
+                                        <button className="button delete-queue" 
+                                                onClick={() => deleteQueue(queue.id)}>Delete</button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="ticket-section">
+                            <h2>Tags</h2>
+                            <p>testing</p>
                         </div>
                         <div className="ticket-section">
                             <h2>Priority</h2>

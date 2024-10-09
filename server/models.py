@@ -49,7 +49,7 @@ class User(db.Model, SerializerMixin):
 class Ticket(db.Model, SerializerMixin):
     __tablename__ = 'tickets'
 
-    serialize_rules = ('-queues',)
+    serialize_rules = ('-queues.tickets',)
 
     id = db.Column(db.Integer, primary_key=True)
     requestor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
