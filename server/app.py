@@ -151,14 +151,21 @@ class TicketByID(Resource):
         
         return ticket.to_dict(), 200
 
-    def post(self, ticket_id):
+    def put(self, ticket_id):
         ticket = Ticket.query.filter(Ticket.id == ticket_id).one_or_none()
         if ticket is None:
             return {'error': 'Ticket not found'}, 404
         data = request.get_json()
 
         try:
-            ticket.queue_id = data.get('queue_id', ticket.queue_id)
+            if 'queue_id' in data:
+                queue = Queue.query.filter(Queue.id == data['queue_id']).one_or_none()
+                if queue is None:
+                    return {'error': 'Queue not found'}, 404
+                if queue not in ticket.queues:
+                    ticket.queues.append(queue)
+
+            ticket.requestor_id = data.get('requestor_id', ticket.requestor_id)
             ticket.email = data.get('email', ticket.email)
             ticket.phone = data.get('phone', ticket.phone)
             ticket.title = data.get('title', ticket.title)
@@ -167,8 +174,9 @@ class TicketByID(Resource):
             ticket.status = data.get('status', ticket.status)
             db.session.commit()
             return ticket.to_dict(), 200
-        
+
         except Exception as e:
+            print(str(e))  # Log the exception
             return {'error': str(e)}, 400
 
     def delete(self, ticket_id):

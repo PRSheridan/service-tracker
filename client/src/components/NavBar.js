@@ -17,7 +17,7 @@ function NavBar({ setUser }) {
         >Home
       </NavLink>
       <NavLink 
-        to={{pathname: "/modify_ticket"}}
+        to={{pathname: "/new_ticket"}}
         className="nav-link button">
         New ticket  
       </NavLink>

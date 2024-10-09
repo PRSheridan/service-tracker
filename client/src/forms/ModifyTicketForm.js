@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-function Ticket() {
+function ModifyTicketForm() {
     const navigate = useNavigate()
-    const {user, setUser} = useOutletContext()
+    const location = useLocation()
+    const ticket = location.state.ticket
+    
     const [errors, setErrors] = useState([])
     const [queues, setQueues] = useState([])
 
@@ -30,21 +32,21 @@ function Ticket() {
     const formik = useFormik({
         initialValues: {
             queue: '',
-            requestor: user.username,
-            email: user.email,
-            phone: user.phone,
-            title: '',
-            description: '',
-            priority: '',
+            requestor: ticket.requestor.username,
+            email: ticket.email,
+            phone: ticket.phone,
+            title: ticket.title,
+            description: ticket.description,
+            priority: ticket.priority,
         },
         validationSchema: formSchema,
         onSubmit: (values) => {
-            fetch('/ticket', {
-                method: 'POST',
+            fetch(`/ticket/${ticket.id}`, {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(values, null, 1),
             }).then((response) => {
-                if (response.ok) { navigate("/home" ) }
+                if (response.ok) { navigate(`/ticket/${ticket.id}`, {state: {ticket: ticket}}) }
                 else { response.json().then((err) => setErrors(err.errors)) }
             });
         },
@@ -125,12 +127,12 @@ function Ticket() {
                         <option value="high">high</option>
                 </select>
                 <div className="button-container">
-                    <button className="button" type="submit">Create Ticket</button>
-                    <button className="button" onClick={ () => navigate("/home" ) }>Cancel</button>
+                    <button className="button" type="submit">Update Ticket</button>
+                    <button className="button" onClick={ () => navigate(`/ticket/${ticket.id}`, {state: {ticket: ticket}}) }>Cancel</button>
                 </div>
             </form>
         </div>
     );
 }
 
-export default Ticket;
+export default ModifyTicketForm;

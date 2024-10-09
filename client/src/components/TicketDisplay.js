@@ -6,15 +6,18 @@ import CommentForm from "../forms/CommentForm.js"
 function TicketDisplay() {
     const navigate = useNavigate()
     const location = useLocation()
-    const ticket = location.state.ticket
     const [showCommentForm, setShowCommentForm] = useState(false)
+    const [ticket, setTicket] = useState(location.state.ticket)
     const [comments, setComments] = useState(ticket.comments);
 
     useEffect(() => {
-        fetch(`/tickets/${ticket.id}/comments`)
+        fetch(`/ticket/${ticket.id}`)
             .then(response => response.json())
-            .then(data => setComments(data));
-    }, [showCommentForm]);
+            .then(data => {
+                setTicket(data)
+                setComments(data.comments)
+            });
+    }, [ticket.id, showCommentForm]);
 
     function deleteTicket() {
         fetch(`/ticket/${ticket.id}`, {
@@ -37,8 +40,11 @@ function TicketDisplay() {
                         <div className="ticket-section">
                             <p><strong>Ticket ID:</strong> {ticket.id}</p>
                             <p><strong>Date:</strong> {ticket.date}</p>
-                            <button className="button ticket-action">Update</button>
-                            <button className="button ticket-action" onClick={() => deleteTicket()}>Delete</button>
+                            <button className="button ticket-action"
+                                    onClick={() => navigate(`/modify_ticket/${ticket.id}`, {state: {ticket: ticket}})}>Update</button>
+                            
+                            <button className="button ticket-action" 
+                                    onClick={() => deleteTicket()}>Delete</button>
                         </div>
                         <div className="ticket-section">
                             <h2>Priority</h2>
@@ -51,7 +57,8 @@ function TicketDisplay() {
                         <div className="ticket-section">
                             <div className="comments-header">
                                 <h2>Comments</h2>
-                                <button className="button add-comment" onClick={() => setShowCommentForm(!showCommentForm)}>New comment</button>
+                                <button className="button add-comment" 
+                                        onClick={() => setShowCommentForm(!showCommentForm)}>New comment</button>
                             </div>
                             <div className="comment-section">
                                 {showCommentForm ? <CommentForm onClose={() => { setShowCommentForm(false); }} ticket={ticket} /> : <></>}
