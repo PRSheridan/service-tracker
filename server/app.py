@@ -33,17 +33,24 @@ class CheckSession(Resource):
 
 class Signup(Resource):
     def post(self):
-        json = request.get_json()
-        username = json.get('username')
-        password = json.get('password')
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        email = data.get('username')
+        phone = data.get('password')
         role = "client"
-        passwordConfirm = json.get('passwordConfirm')
+        passwordConfirm = data.get('passwordConfirm')
 
         if password != passwordConfirm:
             return {'error': '401 Passwords do not match'}, 401
 
         try:
-            user = User(username = username, role=role)
+            user = User(
+                username = username,
+                email = email,
+                phone = phone,
+                role=role
+            )
             user.password_hash = password
 
             db.session.add(user)
@@ -83,17 +90,31 @@ class UserResource(Resource):
     
         return user.to_dict(), 200
     
+# THIS IS AN ABSOLUTE DISASTER PLEASE HELP ME GOD
+
 # UserByID : get, post, delete
 class UserByID(Resource):
     def post(self, user_id):
         user = User.query.filter(User.id == user_id).one_or_none()
         if user is None:
             return {'error': 'User not found'}, 404
+        
         data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        email = data.get('email')
+        phone = data.get('phone')
+        role = data.get('role')
+        passwordConfirm = data.get('passwordConfirm')
+
+        if password != passwordConfirm:
+            return {'error': '401 Passwords do not match'}, 401
 
         try:
-            user.username = data.get('username', user.username)
-            user.role = data.get('role', user.role)
+            user.username = data.get(username, user.username)
+            user.email = data.get(email, user.username)
+            user.phone = data.get(phone, user.username)
+            user.role = data.get(role, user.role)
             if 'password' in data:
                 user.password_hash = data['password']
             db.session.commit()

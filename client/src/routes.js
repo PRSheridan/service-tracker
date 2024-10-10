@@ -1,7 +1,6 @@
 import App from "./App.js"
 import Home from "./pages/Home.js"
 import Profile from "./pages/Profile.js"
-import Queue from "./pages/Queue.js"
 import TicketDisplay from "./components/TicketDisplay.js"
 import ModifyTicketForm from "./forms/ModifyTicketForm.js"
 import NewTicketForm from "./forms/NewTicketForm.js"
@@ -24,10 +23,6 @@ const routes = [
         {
           path: "/modify_user/:id",
           element: <ModifyUserForm />
-        },
-        {
-          path: "/queue",
-          element: <Queue />
         },
         {
           path: "/ticket/:id",

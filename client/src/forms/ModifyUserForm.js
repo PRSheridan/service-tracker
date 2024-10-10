@@ -13,7 +13,6 @@ function ModifyUserForm() {
         username: yup.string().required("Username is required"),
         email: yup.string().email("Invalid email format").required("Email is required"),
         phone: yup.string().nullable(),
-        role: yup.string().required("Role is required"),
     });
 
     const formik = useFormik({
