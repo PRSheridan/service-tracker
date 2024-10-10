@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-
-import CommentForm from "../forms/CommentForm.js"
+import CommentForm from "../forms/CommentForm.js";
+import NewQueueForm from "../forms/NewQueueForm.js";
 
 function TicketDisplay() {
     const navigate = useNavigate()
     const location = useLocation()
     const [showCommentForm, setShowCommentForm] = useState(false)
+    const [showQueueForm, setShowQueueForm] = useState(false)
     const [ticket, setTicket] = useState(location.state.ticket)
-    const [comments, setComments] = useState(ticket.comments);
+    const [comments, setComments] = useState(ticket.comments)
     const [queues, setQueues] = useState([])
 
     useEffect(() => {
@@ -19,15 +20,15 @@ function TicketDisplay() {
                 setComments(data.comments)
                 setQueues(data.queues)
             });
-    }, [ticket.id, showCommentForm]);
+    }, [ticket.id, showCommentForm, showQueueForm])
 
     function deleteTicket() {
         fetch(`/ticket/${ticket.id}`, {
             method: 'DELETE',
-            headers: { 'Content-Type':'application/json' }
+            headers: { 'Content-Type': 'application/json' }
         }).then((response) => {
-            if (response.ok) { navigate("/home" ) }
-        })
+            if (response.ok) { navigate("/home") }
+        });
     }
 
     function deleteQueue(queue_id) {
@@ -36,15 +37,10 @@ function TicketDisplay() {
             headers: { 'Content-Type': 'application/json' }
         }).then((response) => {
             if (response.ok) {
-                setQueues(queues.filter(queue => queue.id !== queue_id));
+                setQueues(queues.filter(queue => queue.id !== queue_id))
             }
-        });
+        })
     }
-
-    //ADD QUEUE NEEDS TO BE ADDED
-
-    console.log(queues)
-
 
     return (
         <div className="ticket-container">
@@ -60,7 +56,6 @@ function TicketDisplay() {
                             <p><strong>Date:</strong> {ticket.date}</p>
                             <button className="button ticket-action"
                                     onClick={() => navigate(`/modify_ticket/${ticket.id}`, {state: {ticket: ticket}})}>Update</button>
-                            
                             <button className="button ticket-action" 
                                     onClick={() => deleteTicket()}>Delete</button>
                         </div>
@@ -74,7 +69,12 @@ function TicketDisplay() {
                                                 onClick={() => deleteQueue(queue.id)}>Delete</button>
                                     </div>
                                 ))}
+                                <div className="queue-bubble add-queue-bubble" 
+                                     onClick={() => setShowQueueForm(!showQueueForm)}>Add queue</div>
                             </div>
+                            {showQueueForm && (
+                                    <NewQueueForm onClose={() => setShowQueueForm(false)} ticket={ticket} />
+                                )}
                         </div>
                         <div className="ticket-section">
                             <h2>Tags</h2>
@@ -95,7 +95,7 @@ function TicketDisplay() {
                                         onClick={() => setShowCommentForm(!showCommentForm)}>New comment</button>
                             </div>
                             <div className="comment-section">
-                                {showCommentForm ? <CommentForm onClose={() => { setShowCommentForm(false); }} ticket={ticket} /> : <></>}
+                                {showCommentForm && ( <CommentForm onClose={() => { setShowCommentForm(false); }} ticket={ticket} /> )}
                                 {comments.length > 0 ? (
                                     comments
                                         .slice()
@@ -130,7 +130,9 @@ function TicketDisplay() {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default TicketDisplay;
+export default TicketDisplay
+
+

@@ -12,7 +12,9 @@ class User(db.Model, SerializerMixin):
 
     serialize_rules = (
         '-tickets',  # Omit tickets to prevent recursion
-        '-queues',  # Omit queues to prevent recursion
+        '-queues.users',  # Omit queues to prevent recursion
+        '-queues.tickets',
+        '-queues.comments',
     )
 
     id = db.Column(db.Integer, primary_key=True)

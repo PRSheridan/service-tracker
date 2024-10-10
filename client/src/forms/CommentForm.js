@@ -26,12 +26,12 @@ function CommentForm ( {ticket, onClose} ) {
 
     return (
         <div className="new-form">
-            <div>New Comment:</div>
             <form onSubmit={ formik.handleSubmit }>
                 <div className="error">{formik.errors.content}</div>
                 <textarea
                 type="text"
                 id="content"
+                placeholder="Enter new comment"
                 autoComplete="off"
                 value={ formik.values.content }
                 onChange={ formik.handleChange }
@@ -39,7 +39,7 @@ function CommentForm ( {ticket, onClose} ) {
                 cols="50"
                 />
             <div className="button-container">
-                <button className="button" type="submit">Add comment</button>
+                <button className="button" type="submit">Submit</button>
                 <button className="button" onClick={() => onClose()}>Cancel</button>
             </div>
             {errors.length > 1 ? <div className="alert">{errors}</div> : <></>}

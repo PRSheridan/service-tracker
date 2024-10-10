@@ -22,9 +22,10 @@ function App() {
   return (
     <>
       <div className="header">
-        <h1 className="title in-line">service-tracker</h1>
-        {user ? <div className="username-display in-line">{user.username}</div> : <></>}
-        <NavBar user={user} setUser={setUser}/>
+        <div className="header-content">
+          <h1 className="title in-line">Service Tracker</h1>
+          <NavBar user={user} setUser={setUser}/>
+        </div>
       </div>
       <div id="app-container">
         <Outlet context={{user, setUser}} />

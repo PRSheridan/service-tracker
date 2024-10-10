@@ -8,7 +8,7 @@ function NewTicketForm() {
     const [queues, setQueues] = useState([])
     
     const navigate = useNavigate()
-    const {user, setUser} = useOutletContext()
+    const { user } = useOutletContext()
 
     useEffect(() => {
         fetch(`/queues`)
@@ -53,7 +53,7 @@ function NewTicketForm() {
 
     return (
         <div className="new-form">
-            <div>New Ticket:</div>
+            <h2>New Ticket:</h2>
             <form onSubmit={formik.handleSubmit}>
                 <div className="error">{formik.errors.queue}</div>
                 <div className="ticket-field">Queue:</div>

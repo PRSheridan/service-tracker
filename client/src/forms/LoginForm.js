@@ -4,10 +4,11 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 
 function LoginForm({ onLogin }) {
-  const [errors, setErrors] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate()
-  
+  const [errors, setErrors] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const navigate = useNavigate();
+
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter username"),
     password: yup.string().required("Must enter a password"),
@@ -36,37 +37,50 @@ function LoginForm({ onLogin }) {
     },
   });
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setIsSubmitted(true);
+    formik.handleSubmit(event);
+  };
+
   return (
-    <form onSubmit={formik.handleSubmit}>
-      <div>Login</div>
-      <div>
-        <div>Username</div>
+    <form onSubmit={handleSubmit} className="form-container-login">
+      <div className="form-title-login">Login</div>
+      <div className="form-field-login">
+        <div className="form-label-login">Username</div>
         <input
           type="text"
           id="username"
           autoComplete="off"
           value={formik.values.username}
           onChange={formik.handleChange}
+          className="form-input-login"
         />
-        <div style={{ color: "red" }}>{formik.errors.username}</div>
+        {isSubmitted && <div className="form-error-login">{formik.errors.username}</div>}
       </div>
-      <div>
-        <div>Password</div>
+      <div className="form-field-login">
+        <div className="form-label-login">Password</div>
         <input
           type="password"
           id="password"
           autoComplete="off"
           value={formik.values.password}
           onChange={formik.handleChange}
+          className="form-input-login"
         />
-        <div style={{ color: "red" }}>{formik.errors.password}</div>
+        {isSubmitted && <div className="form-error-login">{formik.errors.password}</div>}
       </div>
-      <div>
-        <button type="submit">{isLoading ? "Loading..." : "Login"}</button>
-        {errors.length > 0 && <div>{errors}</div>}
+      <div className="button-container-login">
+        <button type="submit" className="form-button-login">
+          {isLoading ? "Loading..." : "Login"}
+        </button>
+        {isSubmitted && errors.length > 0 && <div className="form-error-login">{errors}</div>}
       </div>
     </form>
   );
 }
 
 export default LoginForm;
+
+
+  

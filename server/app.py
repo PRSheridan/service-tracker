@@ -10,7 +10,7 @@ import datetime
 #https://www.w3schools.com/react/react_usecontext.asp
 
 from config import app, db, api
-from models import User, Ticket, Comment, Queue, Tag, Image, ticket_queues
+from models import User, Ticket, Comment, Queue, Tag, Image
 
 @app.route('/')
 def index():
@@ -75,15 +75,16 @@ class Logout(Resource):
         
         return {'error':'401 Unable to process request'}, 401
     
-# UserByID : get, post, delete
-class UserByID(Resource):
-    def get(self, user_id):
-        user = User.query.filter(User.id == user_id).one_or_none()
+class UserResource(Resource):
+    def get(self):
+        user = User.query.filter(User.id == session['user_id']).one_or_none()
         if user is None:
             return {'error': 'User not found'}, 404
-        
+    
         return user.to_dict(), 200
-
+    
+# UserByID : get, post, delete
+class UserByID(Resource):
     def post(self, user_id):
         user = User.query.filter(User.id == user_id).one_or_none()
         if user is None:
@@ -110,6 +111,37 @@ class UserByID(Resource):
         db.session.commit()
 
         return '', 204
+    
+class UserQueues(Resource):
+    def post(self):
+        data = request.get_json()
+
+        user = User.query.filter(User.id == session['user_id']).one_or_none()
+        if user is None:
+            return {'error': 'User not found'}, 404
+        
+        queue = Queue.query.filter(Queue.name == data['name']).one_or_none()
+        if queue is None:
+            return {'error': 'Queue not found'}, 404
+        
+        user.queues.append(queue)
+        db.session.commit()
+        return '', 201
+    
+class UserQueueByID(Resource):
+    def delete(self, queue_id):
+        user = User.query.filter(User.id == session['user_id']).one_or_none()
+        if user is None:
+            return {'error': 'User not found'}, 404
+        
+        queue = Queue.query.filter(Queue.id == queue_id).one_or_none()
+        if queue is None:
+            return {'error': 'Queue not found'}, 404
+        
+        user.queues.remove(queue)
+        db.session.commit()
+        return '', 201
+
 
 # Ticket : get, post
 class TicketIndex(Resource):
@@ -282,9 +314,30 @@ class CommentsByTicketID(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
 
+
 class QueueByTicketID(Resource):
+    def post(self, ticket_id):
+        data = request.get_json()
+
+        queue = Queue.query.filter(Queue.name == data['name']).one_or_none()
+        if queue is None:
+            return {'error': 'Queue not found'}, 404
+        
+        ticket = Ticket.query.filter(Ticket.id == ticket_id).one_or_none()
+        if ticket is None:
+            return {'error': 'Ticket not found'}, 404
+        
+        try:
+            ticket.queues.append(queue)
+            db.session.commit()
+            return '', 201
+
+        except Exception as e:
+            return {'error': str(e)}, 400
+        
+
+class QueueIDByTicketID(Resource):
     def delete(self, ticket_id, queue_id):
-        print(ticket_id, queue_id)
         queue = Queue.query.filter(Queue.id == queue_id).one_or_none()
         if queue is None:
             return {'error': 'Queue not found'}, 404
@@ -464,7 +517,10 @@ api.add_resource(Signup, '/signup')
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
 
+api.add_resource(UserResource, '/user')
 api.add_resource(UserByID, '/user/<int:user_id>')
+api.add_resource(UserQueues, '/user/queues')
+api.add_resource(UserQueueByID, '/user/queue/<int:queue_id>')
 
 api.add_resource(TicketIndex, '/ticket')
 api.add_resource(TicketByID, '/ticket/<int:ticket_id>')
@@ -472,7 +528,8 @@ api.add_resource(TicketByID, '/ticket/<int:ticket_id>')
 api.add_resource(CommentByID, '/comment/<int:comment_id>')
 api.add_resource(CommentsByTicketID, '/tickets/<int:ticket_id>/comments')
 
-api.add_resource(QueueByTicketID, '/ticket/<int:ticket_id>/queue/<int:queue_id>')
+api.add_resource(QueueByTicketID, '/ticket/<int:ticket_id>/queue/')
+api.add_resource(QueueIDByTicketID, '/ticket/<int:ticket_id>/queue/<int:queue_id>')
 api.add_resource(QueueIndex, '/queues')
 api.add_resource(QueueByID, '/queue/<int:queue_id>')
 api.add_resource(QueueByUserID, '/user/queues')

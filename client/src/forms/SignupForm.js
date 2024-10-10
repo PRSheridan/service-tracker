@@ -4,10 +4,10 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 
 function SignupForm({ onLogin }) {
-  const [errors, setErrors] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-
-  const navigate = useNavigate()
+  const [errors, setErrors] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const navigate = useNavigate();
 
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter username"),
@@ -38,48 +38,60 @@ function SignupForm({ onLogin }) {
     },
   });
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    setIsSubmitted(true);
+    formik.handleSubmit(event);
+  };
+
   return (
-    <form onSubmit={formik.handleSubmit}>
-      <div>Signup</div>
-      <div>
-        <div>Username</div>
+    <form onSubmit={handleSubmit} className="form-container-signup">
+      <div className="form-title-signup">Signup</div>
+      <div className="form-field-signup">
+        <div className="form-label-signup">Username</div>
         <input
           type="text"
-          id="username"   
+          id="username"
           autoComplete="off"
           value={formik.values.username}
           onChange={formik.handleChange}
+          className="form-input-signup"
         />
-        <div style={{ color: "red" }}>{formik.errors.username}</div>
+        {isSubmitted && <div className="form-error-signup">{formik.errors.username}</div>}
       </div>
-      <div>
-        <div>Password</div>
+      <div className="form-field-signup">
+        <div className="form-label-signup">Password</div>
         <input
           type="password"
           id="password"
           autoComplete="off"
           value={formik.values.password}
           onChange={formik.handleChange}
+          className="form-input-signup"
         />
-        <div style={{ color: "red" }}>{formik.errors.password}</div>
+        {isSubmitted && <div className="form-error-signup">{formik.errors.password}</div>}
       </div>
-      <div>
-        <div>Confirm password</div>
+      <div className="form-field-signup">
+        <div className="form-label-signup">Confirm password</div>
         <input
           type="password"
           id="passwordConfirm"
           autoComplete="off"
           value={formik.values.passwordConfirm}
           onChange={formik.handleChange}
+          className="form-input-signup"
         />
-        <div style={{ color: "red" }}>{formik.errors.passwordConfirm}</div>
+        {isSubmitted && <div className="form-error-signup">{formik.errors.passwordConfirm}</div>}
       </div>
-      <div>
-        <button type="submit">{isLoading ? "Loading..." : "Create account"}</button>
-        {errors.length > 0 && <div>{errors}</div>}
+      <div className="button-container-signup">
+        <button type="submit" className="form-button-signup">
+          {isLoading ? "Loading..." : "Create account"}
+        </button>
+        {isSubmitted && errors.length > 0 && <div className="form-error-signup">{errors}</div>}
       </div>
     </form>
   );
 }
 
 export default SignupForm;
+

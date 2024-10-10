@@ -42,7 +42,7 @@ function ModifyTicketForm() {
 
     return (
         <div className="new-form">
-            <div>Update ticket:</div>
+            <h2>Update ticket:</h2>
             <form onSubmit={formik.handleSubmit}>
                 <div className="error">{formik.errors.requestor}</div>
                 <div className="ticket-field">Requestor:</div>
