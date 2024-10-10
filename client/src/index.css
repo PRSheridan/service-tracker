@@ -467,3 +467,59 @@ textarea {
   gap: 10px;
 }
 
+.user-profile {
+  background-color: #333;
+  color: var(--text);
+  padding: 20px;
+  border-radius: 5px;
+  margin: auto;
+  width: 60%;
+}
+
+.profile-header {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 28px;
+  color: var(--header);
+  margin: 0;
+}
+
+.edit-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  background-color: #0056b3;
+}
+
+.profile-info {
+  margin-top: 10px;
+}
+
+.username-display {
+  margin: 5px 0;
+}
+
+
+.queue-display-name {
+  font-size: 22px;
+  margin-bottom: 10px;
+  color: #add8e6;
+}
+

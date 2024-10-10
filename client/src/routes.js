@@ -5,6 +5,7 @@ import Queue from "./pages/Queue.js"
 import TicketDisplay from "./components/TicketDisplay.js"
 import ModifyTicketForm from "./forms/ModifyTicketForm.js"
 import NewTicketForm from "./forms/NewTicketForm.js"
+import ModifyUserForm from "./forms/ModifyUserForm.js"
 
 
 const routes = [
@@ -19,6 +20,10 @@ const routes = [
         {
           path: "/profile",
           element: <Profile />
+        },
+        {
+          path: "/modify_user/:id",
+          element: <ModifyUserForm />
         },
         {
           path: "/queue",

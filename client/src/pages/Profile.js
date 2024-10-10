@@ -1,43 +1,53 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-
 import NewQueueForm from "../forms/NewQueueForm";
 
 function Profile() {
-    const { user, setUser } = useOutletContext()
-    const [showQueueForm, setShowQueueForm] = useState(false)
+    const navigate = useNavigate()
+    const { user, setUser } = useOutletContext();
+    const [showQueueForm, setShowQueueForm] = useState(false);
 
     useEffect(() => {
         fetch("/user")
-        .then((response) => {
-          if (response.ok) {
-             response.json().then((updated_user) => setUser(updated_user)) 
-          }
-        })
-      }, [showQueueForm])
+            .then((response) => {
+                if (response.ok) {
+                    response.json().then((updated_user) => setUser(updated_user));
+                }
+            });
+    }, [showQueueForm]);
 
-      function deleteQueue(queue_id) {
+    function deleteQueue(queue_id) {
         fetch(`/user/queue/${queue_id}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' }
         }).then((response) => {
             if (response.ok) {
                 fetch("/user")
-                .then((response) => {
-                    if (response.ok) {
-                        response.json().then((updated_user) => setUser(updated_user));
-                    }
-                })
+                    .then((response) => {
+                        if (response.ok) {
+                            response.json().then((updated_user) => setUser(updated_user));
+                        }
+                    });
             }
-        })
+        });
     }
 
     return (
         <div className="user-profile">
-            <div>{user.username}</div>
-            <div>{user.email}</div>
-            <div>{user.phone}</div>
-            <h2>Queues:</h2>
+            <div className="profile-header">
+                <div className="header-top">
+                    <h1 className="title">{user.username}</h1>
+                    <button className="edit-button" 
+                            onClick={() => navigate(`/modify_user/${user.id}`, {state: {user: user}})}>Edit User Details</button>
+                </div>
+                <div className="profile-info">
+                    <p className="username-display"><strong>Role:</strong> {user.role}</p>
+                    <p className="username-display"><strong>Email:</strong> {user.email}</p>
+                    <p className="username-display"><strong>Phone:</strong> {user.phone}</p>
+                </div>
+            </div>
+            <div className="profile-content">
+                <h2 className="queue-display-name">Assigned Queues:</h2>
                 <div className="queues-container">
                     {user.queues.map(queue => (
                         <div key={queue.id} className="queue-bubble">
@@ -47,13 +57,17 @@ function Profile() {
                         </div>
                     ))}
                     <div className="queue-bubble add-queue-bubble" 
-                            onClick={() => setShowQueueForm(!showQueueForm)}>Add queue</div>
+                         onClick={() => setShowQueueForm(!showQueueForm)}>
+                        Add Queue
+                    </div>
                 </div>
                 {showQueueForm && (
-                        <NewQueueForm onClose={() => setShowQueueForm(false)} />
-                    )}
+                    <NewQueueForm onClose={() => setShowQueueForm(false)} />
+                )}
+            </div>
         </div>
-    )
+    );
+    
 }
 
 export default Profile;
