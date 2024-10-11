@@ -4,10 +4,10 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 
 function LoginForm({ onLogin }) {
-  const [errors, setErrors] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const navigate = useNavigate();
+  const [errors, setErrors] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const navigate = useNavigate()
 
   const formSchema = yup.object().shape({
     username: yup.string().required("Must enter username"),
@@ -37,14 +37,14 @@ function LoginForm({ onLogin }) {
     },
   });
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setIsSubmitted(true);
-    formik.handleSubmit(event);
-  };
+  function handleSubmit(event) {
+    event.preventDefault()
+    setIsSubmitted(true)
+    formik.handleSubmit(event)
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="form-container-login">
+    <form onSubmit={ handleSubmit } className="form-container-login">
       <div className="form-title-login">Login</div>
       <div className="form-field-login">
         <div className="form-label-login">Username</div>

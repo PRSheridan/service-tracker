@@ -37,8 +37,14 @@ function Profile() {
             <div className="profile-header">
                 <div className="header-top">
                     <h1 className="title">{user.username}</h1>
-                    <button className="edit-button" 
-                            onClick={() => navigate(`/modify_user/${user.id}`, {state: {user: user}})}>Edit User Details</button>
+                    <div className="button-group">
+                        <button className="edit-button" 
+                                onClick={() => navigate(`/modify_user/${user.id}`,
+                                                        {state: {user: user}})}>Edit details</button>
+                        <button className="edit-button" 
+                                onClick={() => navigate(`/modify_password/${user.id}`, 
+                                                        {state: {user: user}})}>Change password</button>
+                    </div>
                 </div>
                 <div className="profile-info">
                     <p className="username-display"><strong>Role:</strong> {user.role}</p>
@@ -67,6 +73,7 @@ function Profile() {
             </div>
         </div>
     );
+    
     
 }
 

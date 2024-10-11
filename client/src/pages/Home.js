@@ -7,6 +7,7 @@ function Home() {
     const [queues, setQueues] = useState([])
 
     useEffect(() => {
+        
         fetch(`/user/queues`)
           .then(response => response.json())
           .then(data => {
@@ -19,7 +20,10 @@ function Home() {
             { queues.length > 0 ? ( queues.map((queue) => (
                 <QueueDisplay key={queue.name} queue={ queue }/>
             ))) : (
-                <>No queues to display</>
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <div>Loading...</div>
+                </div>
             )}
         </div>
     )

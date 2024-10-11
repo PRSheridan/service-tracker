@@ -16,6 +16,33 @@ a {
   padding-right: 4px;
 }
 
+/* Loading Spinner Styles */
+.loading-spinner {
+  border: 8px solid rgba(255, 255, 255, 0.3);
+  border-top: 8px solid #6ea8ce;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Loading Container */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+  color: var(--text);
+  font-size: 18px;
+}
+
+
 /* Header Styles */
 .header {
   background-color: #333;
@@ -217,6 +244,7 @@ a {
   font-weight: 500;
   font-size: 26px;
   margin: 10px;
+  color: #5da6c0;
 }
 
 .ticket-row {
@@ -489,23 +517,23 @@ textarea {
   align-items: center;
 }
 
-.title {
-  font-size: 28px;
-  color: var(--header);
-  margin: 0;
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .edit-button {
-  background-color: #007bff;
+  background-color: #72a5b6;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 8px 10px;
   border-radius: 5px;
   cursor: pointer;
 }
 
 .edit-button:hover {
-  background-color: #0056b3;
+  background-color: #add8e6;
 }
 
 .profile-info {
@@ -514,12 +542,5 @@ textarea {
 
 .username-display {
   margin: 5px 0;
-}
-
-
-.queue-display-name {
-  font-size: 22px;
-  margin-bottom: 10px;
-  color: #add8e6;
 }
 

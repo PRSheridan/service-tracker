@@ -94,34 +94,42 @@ class UserResource(Resource):
 
 # UserByID : get, post, delete
 class UserByID(Resource):
-    def post(self, user_id):
+    def put(self, user_id):
         user = User.query.filter(User.id == user_id).one_or_none()
         if user is None:
             return {'error': 'User not found'}, 404
         
         data = request.get_json()
-        username = data.get('username')
         password = data.get('password')
-        email = data.get('email')
-        phone = data.get('phone')
-        role = data.get('role')
         passwordConfirm = data.get('passwordConfirm')
+        passwordCurrent = data.get('passwordCurrent')
 
-        if password != passwordConfirm:
-            return {'error': '401 Passwords do not match'}, 401
+        if user.authenticate(passwordCurrent):
+            return {'error': 'Incorrect current password'}, 401
+
+        if password and password != passwordConfirm:
+            return {'error': 'Passwords do not match'}, 401
 
         try:
-            user.username = data.get(username, user.username)
-            user.email = data.get(email, user.username)
-            user.phone = data.get(phone, user.username)
-            user.role = data.get(role, user.role)
-            if 'password' in data:
-                user.password_hash = data['password']
+            user.username = data.get('username', user.username)
+            user.email = data.get('email', user.email)
+            user.phone = data.get('phone', user.phone)
+            
+            if 'role' in data:
+                if user.role != 'admin':
+                    return {'error': 'Only admins can change roles'}, 403
+                user.role = data.get('role', user.role)
+            
+            # Update password if provided
+            if password:
+                user.password_hash = password
+            
             db.session.commit()
             return user.to_dict(), 200
         
         except Exception as e:
             return {'error': str(e)}, 400
+
 
     def delete(self, user_id):
         user = User.query.filter(User.id == user_id).one_or_none()
@@ -538,27 +546,27 @@ api.add_resource(Signup, '/signup')
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
 
-api.add_resource(UserResource, '/user')
+api.add_resource(UserResource, '/user') #Users
 api.add_resource(UserByID, '/user/<int:user_id>')
 api.add_resource(UserQueues, '/user/queues')
 api.add_resource(UserQueueByID, '/user/queue/<int:queue_id>')
 
-api.add_resource(TicketIndex, '/ticket')
+api.add_resource(TicketIndex, '/ticket') #Tickets
 api.add_resource(TicketByID, '/ticket/<int:ticket_id>')
 
 api.add_resource(CommentByID, '/comment/<int:comment_id>')
 api.add_resource(CommentsByTicketID, '/tickets/<int:ticket_id>/comments')
 
-api.add_resource(QueueByTicketID, '/ticket/<int:ticket_id>/queue/')
-api.add_resource(QueueIDByTicketID, '/ticket/<int:ticket_id>/queue/<int:queue_id>')
-api.add_resource(QueueIndex, '/queues')
+api.add_resource(QueueByTicketID, '/ticket/<int:ticket_id>/queue/') #merge with below
+api.add_resource(QueueIDByTicketID, '/ticket/<int:ticket_id>/queue/<int:queue_id>') 
+api.add_resource(QueueIndex, '/queues') #Queues
+api.add_resource(QueueByUserID, '/user/queues') #QueuesByUser
 api.add_resource(QueueByID, '/queue/<int:queue_id>')
-api.add_resource(QueueByUserID, '/user/queues')
 
-api.add_resource(TagIndex, '/tag')
+api.add_resource(TagIndex, '/tag') #Tags
 api.add_resource(TagByID, '/tag/<int:tag_id>')
 
-api.add_resource(ImageIndex, '/image')
+api.add_resource(ImageIndex, '/image') #Images
 api.add_resource(ImageByID, '/image/<int:image_id>')
 
 if __name__ == '__main__':

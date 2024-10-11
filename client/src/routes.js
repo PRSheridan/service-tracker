@@ -5,6 +5,7 @@ import TicketDisplay from "./components/TicketDisplay.js"
 import ModifyTicketForm from "./forms/ModifyTicketForm.js"
 import NewTicketForm from "./forms/NewTicketForm.js"
 import ModifyUserForm from "./forms/ModifyUserForm.js"
+import ModifyPasswordForm from "./forms/ModifyPasswordForm.js"
 
 
 const routes = [
@@ -23,6 +24,10 @@ const routes = [
         {
           path: "/modify_user/:id",
           element: <ModifyUserForm />
+        },
+        {
+          path: "/modify_password/:id",
+          element: <ModifyPasswordForm />
         },
         {
           path: "/ticket/:id",
