@@ -74,8 +74,9 @@ a {
 
 .nav-link {
   color: #add8e6;
+  font-size: 18px;
   text-decoration: none;
-  padding: 8px 10px 0px 0px;
+  padding: 6px 10px 0px 0px;
   transition: color 0.3s;
 }
 
@@ -280,6 +281,11 @@ a {
   flex: 1;
 }
 
+.ticket-details-extra {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
 .ticket-header {
   display: flex;
   justify-content: space-between;
@@ -302,7 +308,7 @@ a {
 .ticket-content {
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
+  margin-top: 0px;
 }
 
 .ticket-main {
@@ -311,7 +317,7 @@ a {
 }
 
 .ticket-section {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .ticket-section h2 {
@@ -326,6 +332,7 @@ a {
 
 /* Sidebar Styles */
 .sidebar {
+  margin-top: 10px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -336,7 +343,7 @@ a {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
 }
 
 .requestor-info h2 {

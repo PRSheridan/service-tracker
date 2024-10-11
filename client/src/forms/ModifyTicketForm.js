@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -8,6 +8,7 @@ function ModifyTicketForm() {
     const navigate = useNavigate()
     const location = useLocation()
     const ticket = location.state.ticket
+    const user = location.state.user
 
     const formSchema = yup.object().shape({
         requestor: yup.string().required("Requestor ID is required"),
@@ -34,7 +35,7 @@ function ModifyTicketForm() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(values, null, 1),
             }).then((response) => {
-                if (response.ok) { navigate(`/ticket/${ticket.id}`, {state: {ticket: ticket}}) }
+                if (response.ok) { navigate(`/ticket/${ticket.id}`, {state: {ticket: ticket, user:user}}) }
                 else { response.json().then((err) => setErrors(err.errors)) }
             });
         },
@@ -104,7 +105,7 @@ function ModifyTicketForm() {
                 </select>
                 <div className="button-container">
                     <button className="button" type="submit">Update Ticket</button>
-                    <button className="button" onClick={ () => navigate(`/ticket/${ticket.id}`, {state: {ticket: ticket}}) }>Cancel</button>
+                    <button className="button" onClick={ () => navigate(`/ticket/${ticket.id}`, {state: {ticket: ticket, user: user}}) }>Cancel</button>
                 </div>
             </form>
         </div>

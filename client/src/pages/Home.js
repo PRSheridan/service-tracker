@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import QueueDisplay from "../components/QueueDisplay";
 
+//this is where I can useContext: queuedisplay needs user... i could easily pass it as a prop but I'll just do it for the requirement
+
 function Home() {
     const navigate = useNavigate()
     const { user } = useOutletContext()
@@ -42,7 +44,7 @@ function Home() {
                             .sort((a, b) => new Date(b.date) - new Date(a.date))
                             .map((ticket) => (
                             <div key={ticket.id} className="ticket-row"
-                                    onClick={() => navigate(`/ticket/${ticket.id}`, {state: {ticket: ticket}})}>
+                                    onClick={() => navigate(`/ticket/${ticket.id}`, {state: {ticket: ticket, user: user}})}>
                                 <div className="ticket-cell">{ticket.id}</div>
                                 <div className="ticket-cell">{ticket.title}</div>
                                 <div className="ticket-cell">{ticket.requestor.username}</div>

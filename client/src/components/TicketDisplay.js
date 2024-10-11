@@ -4,44 +4,44 @@ import CommentForm from "../forms/CommentForm.js";
 import NewQueueForm from "../forms/NewQueueForm.js";
 
 function TicketDisplay() {
-    const navigate = useNavigate()
-    const location = useLocation()
-    const [showCommentForm, setShowCommentForm] = useState(false)
-    const [showQueueForm, setShowQueueForm] = useState(false)
-    const [ticket, setTicket] = useState(location.state.ticket)
-    const [comments, setComments] = useState(ticket.comments)
-    const [queues, setQueues] = useState([])
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [showCommentForm, setShowCommentForm] = useState(false);
+    const [showQueueForm, setShowQueueForm] = useState(false);
+    const [queues, setQueues] = useState([]);
+    const [ticket, setTicket] = useState(location.state.ticket);
+    const [comments, setComments] = useState(ticket.comments);
+    const user = location.state.user;
 
     useEffect(() => {
         fetch(`/ticket/${ticket.id}`)
             .then(response => response.json())
             .then(data => {
-                setTicket(data)
-                setComments(data.comments)
-                setQueues(data.queues)
+                setTicket(data);
+                setComments(data.comments);
+                setQueues(data.queues);
             });
-    }, [ticket.id, showCommentForm, showQueueForm])
+    }, [ticket.id, showCommentForm, showQueueForm]);
 
     function deleteTicket() {
         fetch(`/ticket/${ticket.id}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' }
         }).then((response) => {
-            if (response.ok) { navigate("/home") }
+            if (response.ok) { navigate("/home"); }
         });
     }
 
-    function deleteQueue(values) {
-        console.log(values)
+    function deleteQueue(queueId) {
         fetch(`/ticket/${ticket.id}/queue/`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(values, null, 1),
+            body: JSON.stringify({ id: queueId }),
         }).then((response) => {
             if (response.ok) {
-                setQueues(queues.filter(queue => queue.id !== values))
+                setQueues(queues.filter(queue => queue.id !== queueId));
             }
-        })
+        });
     }
 
     return (
@@ -54,12 +54,14 @@ function TicketDisplay() {
                 <div className="ticket-content">
                     <div className="ticket-main">
                         <div className="ticket-section">
-                            <p><strong>Ticket ID:</strong> {ticket.id}</p>
-                            <p><strong>Date:</strong> {ticket.date}</p>
                             <button className="button ticket-action"
-                                    onClick={() => navigate(`/modify_ticket/${ticket.id}`, {state: {ticket: ticket}})}>Update</button>
-                            <button className="button ticket-action" 
+                                    onClick={() => navigate(`/modify_ticket/${ticket.id}`, { state: { ticket, user } })}>Update</button>
+                            <button className="button ticket-action"
                                     onClick={() => deleteTicket()}>Delete</button>
+                            <div className="ticket-details-extra">
+                                <p><strong>Ticket ID:</strong> {ticket.id}</p>
+                                <p><strong>Date:</strong> {ticket.date}</p>
+                            </div>
                         </div>
                         <div className="ticket-section">
                             <h2>Queues</h2>
@@ -67,20 +69,24 @@ function TicketDisplay() {
                                 {queues.map(queue => (
                                     <div key={queue.id} className="queue-bubble">
                                         {queue.name}
-                                        <button className="button delete-queue" 
-                                                onClick={() => deleteQueue(queue.id)}>Delete</button>
+                                        {user.role !== 'client' && (
+                                            <button className="button delete-queue"
+                                                    onClick={() => deleteQueue(queue.id)}>Delete</button>
+                                        )}
                                     </div>
                                 ))}
-                                <div className="queue-bubble add-queue-bubble" 
-                                     onClick={() => setShowQueueForm(!showQueueForm)}>Add queue</div>
-                            </div>
-                            {showQueueForm && (
-                                    <NewQueueForm onClose={() => setShowQueueForm(false)} ticket={ticket} />
+                                {user.role !== 'client' && (
+                                    <div className="queue-bubble add-queue-bubble"
+                                         onClick={() => setShowQueueForm(!showQueueForm)}>Add queue</div>
                                 )}
+                            </div>
+                            {showQueueForm && user.role !== 'client' && (
+                                <NewQueueForm onClose={() => setShowQueueForm(false)} ticket={ticket} />
+                            )}
                         </div>
                         <div className="ticket-section">
                             <h2>Tags</h2>
-                            <p>testing</p>
+                            <p>tags</p>
                         </div>
                         <div className="ticket-section">
                             <h2>Priority</h2>
@@ -93,11 +99,11 @@ function TicketDisplay() {
                         <div className="ticket-section">
                             <div className="comments-header">
                                 <h2>Comments</h2>
-                                <button className="button add-comment" 
+                                <button className="button add-comment"
                                         onClick={() => setShowCommentForm(!showCommentForm)}>New comment</button>
                             </div>
                             <div className="comment-section">
-                                {showCommentForm && ( <CommentForm onClose={() => { setShowCommentForm(false); }} ticket={ticket} /> )}
+                                {showCommentForm && (<CommentForm onClose={() => { setShowCommentForm(false); }} ticket={ticket} />)}
                                 {comments.length > 0 ? (
                                     comments
                                         .slice()
@@ -132,7 +138,7 @@ function TicketDisplay() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
-export default TicketDisplay
+export default TicketDisplay;
