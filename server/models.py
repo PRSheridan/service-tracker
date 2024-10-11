@@ -11,8 +11,10 @@ class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
     serialize_rules = (
-        '-tickets',  # Omit tickets to prevent recursion
-        '-queues.users',  # Omit queues to prevent recursion
+        '-tickets.users',
+        '-tickets.comments',
+        '-tickets.requestor',
+        '-queues.users',
         '-queues.tickets',
         '-queues.comments',
     )
@@ -28,6 +30,12 @@ class User(db.Model, SerializerMixin):
     tickets = db.relationship('Ticket', back_populates='requestor', cascade='all, delete-orphan')
     comments = db.relationship('Comment', back_populates='user', cascade='all, delete-orphan')
     queues = db.relationship('Queue', secondary='user_queues', back_populates='users')
+
+    @validates('role')
+    def validate_role(self, key, role):
+        if role not in ['client', 'admin']:
+            raise ValueError("Role must be either 'client' or 'admin'.")
+        return role
 
     @hybrid_property
     def password_hash(self):
@@ -69,6 +77,18 @@ class Ticket(db.Model, SerializerMixin):
     comments = db.relationship('Comment', back_populates='ticket', cascade='all, delete-orphan')
     queues = db.relationship('Queue', secondary='ticket_queues', back_populates='tickets')
     images = db.relationship('Image', back_populates='ticket', cascade='all, delete-orphan')
+
+    @validates('priority')
+    def validate_role(self, key, priority):
+        if priority not in ['low', 'medium', 'high']:
+            raise ValueError("Priority must be 'low', 'medium', or 'high'.")
+        return priority
+    
+    @validates('status')
+    def validate_role(self, key, status):
+        if status not in ['new', 'in-progress', 'closed']:
+            raise ValueError("Status must be 'new', 'in-progress', or 'closed'.")
+        return status
 
 
 # Queue Model

@@ -52,6 +52,7 @@ function Profile() {
                     <p className="username-display"><strong>Phone:</strong> {user.phone}</p>
                 </div>
             </div>
+            {user.role == "client" ? <></> :
             <div className="profile-content">
                 <h2 className="queue-display-name">Assigned Queues:</h2>
                 <div className="queues-container">
@@ -70,7 +71,7 @@ function Profile() {
                 {showQueueForm && (
                     <NewQueueForm onClose={() => setShowQueueForm(false)} />
                 )}
-            </div>
+            </div>}
         </div>
     );
     

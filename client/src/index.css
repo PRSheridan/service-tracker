@@ -42,7 +42,6 @@ a {
   font-size: 18px;
 }
 
-
 /* Header Styles */
 .header {
   background-color: #333;
@@ -61,9 +60,10 @@ a {
   font-size: 24px;
 }
 
-.username-display {
+.username-nav {
+  font-size: 24px;
   color: #fff;
-  margin: 5px;
+  margin-bottom: 0px;
 }
 
 /* Navigation Bar */
@@ -75,7 +75,7 @@ a {
 .nav-link {
   color: #add8e6;
   text-decoration: none;
-  padding: 5px 10px;
+  padding: 8px 10px 0px 0px;
   transition: color 0.3s;
 }
 
@@ -538,9 +538,5 @@ textarea {
 
 .profile-info {
   margin-top: 10px;
-}
-
-.username-display {
-  margin: 5px 0;
 }
 

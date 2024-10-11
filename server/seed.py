@@ -38,7 +38,7 @@ if __name__ == '__main__':
                 email=fake.email(),
                 phone=fake.phone_number(),
                 _password_hash="test",  # Assigning password directly
-                role=choice(['admin', 'user'])
+                role=choice(['client', 'admin'])
             )
             user.queues = sample(queues, k=randint(1, 3))
             users.append(user)
@@ -56,7 +56,7 @@ if __name__ == '__main__':
                 title=fake.sentence(),
                 description=fake.text(),
                 priority=choice(['low', 'medium', 'high']),
-                status=choice(['open', 'closed', 'in progress'])
+                status=choice(['new', 'in-progress', 'closed'])
             )
             ticket.queues = sample(queues, k=randint(1, 3))
             db.session.add(ticket)

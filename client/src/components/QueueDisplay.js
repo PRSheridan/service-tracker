@@ -6,7 +6,7 @@ function QueueDisplay({ queue }) {
 
     return (
         <div className="ticket-list">
-            <div className="queue-display-name">{queue.name} queue</div>
+            <div className="queue-display-name">{queue.name}</div>
             <div className="queue-display-header">
                 <div className="ticket-column">Ticket ID</div>
                 <div className="ticket-column">Title</div>

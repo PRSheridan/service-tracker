@@ -99,7 +99,7 @@ function ModifyTicketForm() {
                     value={ formik.values.priority }
                     onChange={ formik.handleChange }>
                         <option value="low">low</option>
-                        <option value="mid">mid</option>
+                        <option value="medium">medium</option>
                         <option value="high">high</option>
                 </select>
                 <div className="button-container">

@@ -26,7 +26,7 @@ function NavBar({ user, setUser }) {
         className="nav-link nav-button"
         >Profile
       </NavLink>
-      {user ? <div className="username-display in-line">{user.username}</div> : <></>}
+      {user ? <div className="username-nav in-line">{user.username}</div> : <></>}
       <NavLink className="nav-link nav-button" onClick={handleLogoutClick}>
         LOGOUT  
       </NavLink>

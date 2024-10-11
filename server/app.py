@@ -5,10 +5,6 @@ from flask_restful import Resource
 from werkzeug.utils import secure_filename
 import datetime
 
-# Local imports
-#https://medium.com/@brodiea19/flask-sqlalchemy-how-to-upload-photos-and-render-them-to-your-webpage-84aa549ab39e
-#https://www.w3schools.com/react/react_usecontext.asp
-
 from config import app, db, api
 from models import User, Ticket, Comment, Queue, Tag, Image
 
@@ -82,7 +78,7 @@ class Logout(Resource):
         
         return {'error':'401 Unable to process request'}, 401
     
-class UserResource(Resource):
+class Users(Resource):
     def get(self):
         user = User.query.filter(User.id == session['user_id']).one_or_none()
         if user is None:
@@ -104,8 +100,8 @@ class UserByID(Resource):
         passwordConfirm = data.get('passwordConfirm')
         passwordCurrent = data.get('passwordCurrent')
 
-        if user.authenticate(passwordCurrent):
-            return {'error': 'Incorrect current password'}, 401
+        #if user.authenticate(passwordCurrent):
+        #    return {'error': 'Incorrect current password'}, 401
 
         if password and password != passwordConfirm:
             return {'error': 'Passwords do not match'}, 401
@@ -121,8 +117,8 @@ class UserByID(Resource):
                 user.role = data.get('role', user.role)
             
             # Update password if provided
-            if password:
-                user.password_hash = password
+            #if password:
+            #   user.password_hash = password
             
             db.session.commit()
             return user.to_dict(), 200
@@ -142,6 +138,14 @@ class UserByID(Resource):
         return '', 204
     
 class UserQueues(Resource):
+    def get(self):        
+        user = User.query.filter(User.id == session['user_id']).one_or_none()
+        if user is None:
+            return {'error': 'User not found'}, 404
+        
+        queues = user.queues
+        return [queue.to_dict() for queue in queues], 200
+
     def post(self):
         data = request.get_json()
 
@@ -170,10 +174,18 @@ class UserQueueByID(Resource):
         user.queues.remove(queue)
         db.session.commit()
         return '', 201
-
+    
+class UserTickets(Resource):
+    def get(self):
+        user = User.query.filter(User.id == session['user_id']).one_or_none()
+        if user is None:
+            return {'error': 'User not found'}, 404
+        
+        tickets = user.tickets
+        return [ticket.to_dict() for ticket in tickets], 200
 
 # Ticket : get, post
-class TicketIndex(Resource):
+class Tickets(Resource):
     def get(self):
         tickets = Ticket.query.all()
         return [ticket.to_dict() for ticket in tickets], 200
@@ -364,9 +376,8 @@ class QueueByTicketID(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
         
-
-class QueueIDByTicketID(Resource):
-    def delete(self, ticket_id, queue_id):
+    def delete(self, ticket_id):
+        queue_id = request.get_json()
         queue = Queue.query.filter(Queue.id == queue_id).one_or_none()
         if queue is None:
             return {'error': 'Queue not found'}, 404
@@ -384,7 +395,7 @@ class QueueIDByTicketID(Resource):
             return {'error': str(e)}, 400
 
 # Queue : get, post
-class QueueIndex(Resource):
+class Queues(Resource):
     def get(self):
         queues = [queue.name for queue in Queue.query.all()]
         return queues, 200
@@ -432,20 +443,8 @@ class QueueByID(Resource):
         db.session.commit()
         return '', 204
 
-# QueueByUserID : get
-class QueueByUserID(Resource):
-    def get(self):
-        user_id = session.get('user_id')
-        if not user_id:
-            return {'error': 'User not logged in'}, 401
-        user = User.query.filter(User.id == user_id).one_or_none()
-        if user is None:
-            return {'error': 'User not found'}, 404
-        queues = user.queues
-        return [queue.to_dict() for queue in queues], 200
-
 # Tag : get, post
-class TagIndex(Resource):
+class Tags(Resource):
     def get(self):
         tags = Tag.query.all()
         return [tag.to_dict() for tag in tags], 200
@@ -474,7 +473,6 @@ class TagByID(Resource):
         return '', 204
 
 # Image : post
-#https://medium.com/@brodiea19/flask-sqlalchemy-how-to-upload-photos-and-render-them-to-your-webpage-84aa549ab39e
 def validate_image(stream):
     header = stream.read(512)
     stream.seek(0)
@@ -483,7 +481,7 @@ def validate_image(stream):
         return None
     return "." + (format if format != "jpeg" else "jpg")
 
-class ImageIndex(Resource):
+class Images(Resource):
     def post(self):
         data = request.get_json()
         info = request.form.get("info")
@@ -545,28 +543,21 @@ api.add_resource(CheckSession, '/check_session')
 api.add_resource(Signup, '/signup')
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
-
-api.add_resource(UserResource, '/user') #Users
+api.add_resource(Users, '/user')
 api.add_resource(UserByID, '/user/<int:user_id>')
 api.add_resource(UserQueues, '/user/queues')
 api.add_resource(UserQueueByID, '/user/queue/<int:queue_id>')
-
-api.add_resource(TicketIndex, '/ticket') #Tickets
+api.add_resource(UserTickets, '/user/tickets')
+api.add_resource(Tickets, '/ticket')
 api.add_resource(TicketByID, '/ticket/<int:ticket_id>')
-
 api.add_resource(CommentByID, '/comment/<int:comment_id>')
 api.add_resource(CommentsByTicketID, '/tickets/<int:ticket_id>/comments')
-
-api.add_resource(QueueByTicketID, '/ticket/<int:ticket_id>/queue/') #merge with below
-api.add_resource(QueueIDByTicketID, '/ticket/<int:ticket_id>/queue/<int:queue_id>') 
-api.add_resource(QueueIndex, '/queues') #Queues
-api.add_resource(QueueByUserID, '/user/queues') #QueuesByUser
+api.add_resource(QueueByTicketID, '/ticket/<int:ticket_id>/queue/')
+api.add_resource(Queues, '/queues')
 api.add_resource(QueueByID, '/queue/<int:queue_id>')
-
-api.add_resource(TagIndex, '/tag') #Tags
+api.add_resource(Tags, '/tag')
 api.add_resource(TagByID, '/tag/<int:tag_id>')
-
-api.add_resource(ImageIndex, '/image') #Images
+api.add_resource(Images, '/image')
 api.add_resource(ImageByID, '/image/<int:image_id>')
 
 if __name__ == '__main__':

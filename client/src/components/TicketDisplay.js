@@ -31,13 +31,15 @@ function TicketDisplay() {
         });
     }
 
-    function deleteQueue(queue_id) {
-        fetch(`/ticket/${ticket.id}/queue/${queue_id}`, {
+    function deleteQueue(values) {
+        console.log(values)
+        fetch(`/ticket/${ticket.id}/queue/`, {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(values, null, 1),
         }).then((response) => {
             if (response.ok) {
-                setQueues(queues.filter(queue => queue.id !== queue_id))
+                setQueues(queues.filter(queue => queue.id !== values))
             }
         })
     }
