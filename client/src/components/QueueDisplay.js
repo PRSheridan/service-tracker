@@ -2,16 +2,20 @@ import React, { useContext } from "react"
 import { useNavigate } from "react-router-dom"
 import UserContext from "../context"
 
-function QueueDisplay({ queue }) {
+function QueueDisplay({ userTickets, queue }) {
     const navigate = useNavigate()
-    const { user } = useContext(UserContext)
+    const user = useContext(UserContext)
+
+    const tickets = userTickets || (queue ? queue.tickets : [])
 
     function renderTickets() {
-        if (queue.tickets.length === 0) {
+        if (tickets.length === 0) {
             return <div>No tickets to display</div>
         }
 
-        const sortedTickets = [...queue.tickets].sort((a, b) => new Date(b.date) - new Date(a.date))
+        console.log(user)
+
+        const sortedTickets = [...tickets].sort((a, b) => new Date(b.date) - new Date(a.date))
 
         return sortedTickets.map((ticket) => (
             <div key={ticket.id} className="ticket-row"
@@ -27,7 +31,7 @@ function QueueDisplay({ queue }) {
 
     return (
         <div className="ticket-list">
-            <div className="queue-display-name">{queue.name}</div>
+            {queue ? <div className="queue-display-name">{queue.name}</div> : null}
             <div className="queue-display-header">
                 <div className="ticket-column">Ticket ID</div>
                 <div className="ticket-column">Title</div>
