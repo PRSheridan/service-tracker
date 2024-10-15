@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 import { useFormik } from "formik"
 import * as yup from "yup"
 
-function CommentForm ( {ticket, onClose} ) {
+function CommentForm({ ticket, onClose }) {
     const [errors, setErrors] = useState([])
 
     const formSchema = yup.object().shape({
-        content: yup.string().required("Comment must have content").max(256, "Content must be less than 256 characters"),
+        content: yup
+            .string()
+            .required("Comment must have content")
+            .max(256, "Content must be less than 256 characters")
     })
 
     const formik = useFormik({
@@ -21,13 +24,13 @@ function CommentForm ( {ticket, onClose} ) {
                 if (response.ok) { onClose() }
                 else { response.json().then((err) => setErrors(err.errors)) }
             })
-        },
+        }
     })
 
     return (
         <div className="new-form">
             <form onSubmit={ formik.handleSubmit }>
-                <div className="error">{formik.errors.content}</div>
+                {formik.errors.content && <div className="error">{formik.errors.content}</div>}
                 <textarea
                 type="text"
                 id="content"

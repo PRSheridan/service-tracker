@@ -24,18 +24,19 @@ function LoginForm({ onLogin }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values, null, 2),
       }).then((response) => {
-        setIsLoading(false);
+        setIsLoading(false)
         if (response.ok) {
-          navigate("/home");
-          response.json().then((user) => onLogin(user));
-        } else {
-          response.json().then((err) => {
-            setErrors(err.error);
-          });
-        }
-      });
+            response.json().then((user) => {
+                onLogin(user)
+                navigate("/home")
+        })} 
+        else {
+            response.json().then((err) => {
+                setErrors(err.error)
+        })}
+      })
     },
-  });
+  })
 
   function handleSubmit(event) {
     event.preventDefault()
@@ -44,43 +45,43 @@ function LoginForm({ onLogin }) {
   }
 
   return (
-    <form onSubmit={ handleSubmit } className="form-container-login">
+    <form onSubmit={handleSubmit} className="form-container-login">
       <div className="form-title-login">Login</div>
       <div className="form-field-login">
-        <div className="form-label-login">Username</div>
+        <label htmlFor="username" className="form-label-login">Username</label>
         <input
-          type="text"
-          id="username"
-          autoComplete="off"
-          value={formik.values.username}
-          onChange={formik.handleChange}
-          className="form-input-login"
+            type="text"
+            id="username"
+            autoComplete="off"
+            value={formik.values.username}
+            onChange={formik.handleChange}
+            className="form-input-login"
         />
         {isSubmitted && <div className="form-error-login">{formik.errors.username}</div>}
       </div>
       <div className="form-field-login">
-        <div className="form-label-login">Password</div>
+        <label htmlFor="password" className="form-label-login">Password</label>
         <input
-          type="password"
-          id="password"
-          autoComplete="off"
-          value={formik.values.password}
-          onChange={formik.handleChange}
-          className="form-input-login"
+            type="password"
+            id="password"
+            autoComplete="off"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            className="form-input-login"
         />
         {isSubmitted && <div className="form-error-login">{formik.errors.password}</div>}
       </div>
       <div className="button-container-login">
         <button type="submit" className="form-button-login">
-          {isLoading ? "Loading..." : "Login"}
+            {isLoading ? "Loading..." : "Login"}
         </button>
         {isSubmitted && errors.length > 0 && <div className="form-error-login">{errors}</div>}
       </div>
     </form>
-  );
+    )
 }
 
-export default LoginForm;
+export default LoginForm
 
 
   

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import UserContext from "../context";
 import QueueDisplay from "../components/QueueDisplay";
 
-//this is where I can useContext: queuedisplay needs user... i could easily pass it as a prop but I'll just do it for the requirement
+//this is where I can useContext: queuedisplay needs user...
+// i could easily pass it as a prop but I'll just do it for the requirement
 
 function Home() {
     const navigate = useNavigate()
-    const { user } = useOutletContext()
+    const user = useOutletContext()
     const [isLoading, setIsLoading] = useState(true)
     const [data, setData] = useState([])
 
@@ -60,7 +62,9 @@ function Home() {
                         <div className="admin-queues">
                             {data.length > 0 ? (
                                 data.map((queue) => (
-                                    <QueueDisplay key={queue.name} queue={queue} />
+                                    <UserContext.Provider value={ user }>
+                                        <QueueDisplay key={queue.name} queue={queue} />
+                                    </UserContext.Provider>
                                 ))
                             ) : (
                                 <div>No queues to display.</div>
