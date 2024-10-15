@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import { useOutletContext } from "react-router-dom"
 import UserContext from "../context"
 import QueueDisplay from "../components/QueueDisplay"
+import SearchBar from "../components/SearchBar"
 
 function Home() {
   const {user, setUser} = useOutletContext()
@@ -27,7 +28,8 @@ function Home() {
         </div>
       ) : (
         <UserContext.Provider value={user}>
-          {user.role == "client" ? (
+            <SearchBar />
+            {user.role == "client" ? (
             <div className="client-tickets">
               <div className="queue-display-name">{user.username}'s tickets:</div>
               {data.length > 0 ? (
@@ -38,7 +40,6 @@ function Home() {
             </div>
           ) : (
             <div className="admin-queues">
-                <div>testing</div>
               {data.length > 0 ? (
                 data.map((queue) => (
                     <QueueDisplay key={queue.name} queue={queue} />

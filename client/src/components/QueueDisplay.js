@@ -13,8 +13,6 @@ function QueueDisplay({ userTickets, queue }) {
             return <div>No tickets to display</div>
         }
 
-        console.log(user)
-
         const sortedTickets = [...tickets].sort((a, b) => new Date(b.date) - new Date(a.date))
 
         return sortedTickets.map((ticket) => (

@@ -3,6 +3,7 @@ import imghdr, uuid, os
 from flask import request, session, make_response, send_from_directory
 from flask_restful import Resource
 from werkzeug.utils import secure_filename
+from sqlalchemy import or_
 import datetime
 
 from config import app, db, api
@@ -304,6 +305,28 @@ class TicketByQueueID(Resource):
         
         except Exception as e:
             return {'error': str(e)}, 400
+        
+
+class TicketBySearchQuery(Resource):
+  def get(self):
+    query_params = request.args
+    search_query = query_params.get('query', '').lower()
+
+    # Start the query and join with User and Tag
+    query = Ticket.query.join(Ticket.requestor).join(Ticket.tags)
+
+    # Apply filters based on the search query
+    query = query.filter(
+      or_(
+        Ticket.id == search_query,
+        Ticket.title.ilike(f'%{search_query}%'),
+        User.username.ilike(f'%{search_query}%'),
+        Tag.name.ilike(f'%{search_query}%')
+      )
+    )
+
+    tickets = query.all()
+    return [ticket.to_dict() for ticket in tickets], 200
 
 # CommentByID : post, delete
 class CommentByID(Resource):
@@ -548,7 +571,7 @@ api.add_resource(UserByID, '/user/<int:user_id>')
 api.add_resource(UserQueues, '/user/queues')
 api.add_resource(UserQueueByID, '/user/queue/<int:queue_id>')
 api.add_resource(UserTickets, '/user/tickets')
-api.add_resource(Tickets, '/ticket')
+api.add_resource(Tickets, '/tickets')
 api.add_resource(TicketByID, '/ticket/<int:ticket_id>')
 api.add_resource(CommentByID, '/comment/<int:comment_id>')
 api.add_resource(CommentsByTicketID, '/tickets/<int:ticket_id>/comments')

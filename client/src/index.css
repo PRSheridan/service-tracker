@@ -242,9 +242,11 @@ a {
 }
 
 .queue-display-name {
+  background-color:#333;
   font-weight: 500;
   font-size: 26px;
-  margin: 10px;
+  outline:#333;
+  padding: 10px;
   color: #5da6c0;
 }
 
