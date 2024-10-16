@@ -103,6 +103,10 @@ a {
   transition: background-color 0.3s, color 0.3s;
 }
 
+.clear-search {
+  margin-left: 4px;
+}
+
 .button:hover,
 .button:active {
   background-color: rgba(68, 68, 68, 0.8);
@@ -242,12 +246,19 @@ a {
 }
 
 .queue-display-name {
-  background-color:#333;
-  font-weight: 500;
+  background-color:#333333e7;
   font-size: 26px;
   outline:#333;
   padding: 10px;
-  color: #5da6c0;
+  color: #fff;
+}
+
+.search-results {
+  background-color:#333333e7;
+  font-size: 20px;
+  outline:#333;
+  padding: 6px;
+  color: #fff;
 }
 
 .ticket-row {
@@ -354,6 +365,14 @@ a {
 
 .requestor-info p {
   margin: 5px 0;
+}
+
+.search-box {
+  margin: 10px;
+}
+
+#searchbar {
+  margin-bottom: 15px;
 }
 
 /* Queues Container */
@@ -493,7 +512,7 @@ select,
 textarea {
   width: 98%;
   padding: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }

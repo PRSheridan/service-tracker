@@ -1,7 +1,7 @@
 import App from "./App.js"
 import Home from "./pages/Home.js"
 import Profile from "./pages/Profile.js"
-import TicketDisplay from "./components/TicketDisplay.js"
+import Ticket from "./pages/Ticket.js"
 import ModifyTicketForm from "./forms/ModifyTicketForm.js"
 import NewTicketForm from "./forms/NewTicketForm.js"
 import ModifyUserForm from "./forms/ModifyUserForm.js"
@@ -31,7 +31,7 @@ const routes = [
         },
         {
           path: "/ticket/:id",
-          element: <TicketDisplay />
+          element: <Ticket />
         },
         {
           path: "/new_ticket",

@@ -309,16 +309,17 @@ class TicketByQueueID(Resource):
 
 class TicketBySearchQuery(Resource):
   def get(self):
-    query_params = request.args
-    search_query = query_params.get('query', '').lower()
+    search_query = request.args.get('q', '').lower()
 
-    # Start the query and join with User and Tag
-    query = Ticket.query.join(Ticket.requestor).join(Ticket.tags)
+    if not search_query:
+      return {"error": "Search query is required"}, 400
 
-    # Apply filters based on the search query
+    query = Ticket.query.join(User).outerjoin(Ticket.tags)
+
+    # Filtering based on the search query
     query = query.filter(
-      or_(
-        Ticket.id == search_query,
+      db.or_(
+        Ticket.id.cast(db.String).ilike(f'%{search_query}%'),
         Ticket.title.ilike(f'%{search_query}%'),
         User.username.ilike(f'%{search_query}%'),
         Tag.name.ilike(f'%{search_query}%')
@@ -573,6 +574,7 @@ api.add_resource(UserQueueByID, '/user/queue/<int:queue_id>')
 api.add_resource(UserTickets, '/user/tickets')
 api.add_resource(Tickets, '/tickets')
 api.add_resource(TicketByID, '/ticket/<int:ticket_id>')
+api.add_resource(TicketBySearchQuery, '/tickets/search')
 api.add_resource(CommentByID, '/comment/<int:comment_id>')
 api.add_resource(CommentsByTicketID, '/tickets/<int:ticket_id>/comments')
 api.add_resource(QueueByTicketID, '/ticket/<int:ticket_id>/queue/')

@@ -1,35 +1,16 @@
-import React, { useContext, useState, useEffect } from "react"
+import React, { useContext, useState } from "react"
 import { useFormik } from "formik"
 import * as yup from "yup"
 import UserContext from "../context"
 
 function SearchBar() {
   const user = useContext(UserContext)
-  const [tickets, setTickets] = useState([])
   const [filteredTickets, setFilteredTickets] = useState([])
   const [errors, setErrors] = useState([])
-
-  // Fetch tickets on component mount
-  useEffect(() => {
-    fetch('/tickets')
-      .then(response => {
-        if (response.ok) {
-          response.json()
-            .then(data => {
-              setTickets(data)
-              console.log("Fetched tickets:", data) // Debug log to verify fetched data
-            })
-        } else {
-          console.error("Failed to fetch tickets") // Error handling
-          setErrors(["Failed to fetch tickets"])
-        }
-      })
-  }, [])
 
   const formSchema = yup.object().shape({
     searchTerm: yup
       .string()
-      .required("Search term is required")
       .max(64, "Search term must be less than 64 characters")
   })
 
@@ -38,31 +19,37 @@ function SearchBar() {
     initialValues: { searchTerm: "" },
     validationSchema: formSchema,
     onSubmit: (values) => {
-      const lowercasedTerm = values.searchTerm.toLowerCase()
-      console.log("Searching for:", lowercasedTerm) // Debug log for search term
+      const searchTerm = values.searchTerm.toLowerCase()
+      console.log("Searching for:", searchTerm) // Debug log for search term
 
-      // Filter the tickets based on title, tag, requestor, or ID
-      const results = tickets.filter(ticket =>
-        ticket.title.toLowerCase().includes(lowercasedTerm) ||
-        ticket.tag?.toLowerCase().includes(lowercasedTerm) ||
-        ticket.requestor.toLowerCase().includes(lowercasedTerm) ||
-        ticket.id.toString().includes(lowercasedTerm) // Include ticket.id in the search
-      )
-
-      console.log("Filtered results:", results) // Debug log for filtered results
-
-      if (results.length === 0) {
-        setErrors(["No matching tickets found"]) // Set error if no results found
-        setFilteredTickets([]) // Clear filtered tickets
-      } else {
-        setErrors([]) // Clear errors
-        setFilteredTickets(results) // Update filtered tickets
-      }
+      // Fetch tickets matching the search term
+      fetch(`/tickets/search?q=${searchTerm}`)
+        .then(response => {
+          if (response.ok) { response.json()
+            .then(data => {
+              console.log("Filtered results from backend:", data) // Debug log for filtered results
+              if (data.length === 0) {
+                setErrors(["No matching tickets found"])
+                setFilteredTickets([])
+              } else {
+                setErrors([]) // Clear errors
+                setFilteredTickets(data) // Update filtered tickets
+              }
+            })
+          }
+        })
     }
   })
 
+  // Function to clear search results
+  const clearSearch = () => {
+    setFilteredTickets([])
+    formik.setFieldValue('searchTerm', '') // Clear the input field
+    setErrors([]) // Clear any existing errors
+  }
+
   return (
-    <div>
+    <div className="search-box">
       <nav id="searchbar">
         <form onSubmit={formik.handleSubmit}>
           {formik.errors.searchTerm && <div className="error">{formik.errors.searchTerm}</div>}
@@ -70,15 +57,18 @@ function SearchBar() {
           <input
             type="text"
             id="searchTerm"
-            placeholder="Search tickets by title, tag, requestor, or ID..."
+            placeholder="Search tickets by title, requestor, tags, or ID..."
             autoComplete="off"
             value={formik.values.searchTerm}
             onChange={formik.handleChange}
-            style={{ padding: "5px", marginRight: "10px" }}
           />
 
-          <button type="submit" style={{ padding: "5px 10px" }}>
+          <button className="button" type="submit">
             Search
+          </button>
+
+          <button className="button clear-search" type="button" onClick={clearSearch}>
+            Clear
           </button>
 
           {errors.length > 0 && <div className="alert">{errors[0]}</div>}
@@ -86,41 +76,46 @@ function SearchBar() {
       </nav>
 
       {filteredTickets.length > 0 && (
-        <table style={{ marginTop: "20px", width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th>Ticket ID</th>
-              <th>Matching Attribute</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredTickets.map(ticket => {
-              const searchTerm = formik.values.searchTerm.toLowerCase()
-              let matchingAttribute = ""
+        <div className="ticket-list">
+          <div className="search-results">Search Results</div>
+          <div className="queue-display-header">
+            <div className="ticket-cell">Ticket ID</div>
+            <div className="ticket-cell">Title</div>
+            <div className="ticket-cell">Matching Attribute</div>
+          </div>
 
-              if (ticket.title.toLowerCase().includes(searchTerm)) {
-                matchingAttribute = `Title: ${ticket.title}`
-              } else if (ticket.tag?.toLowerCase().includes(searchTerm)) {
-                matchingAttribute = `Tag: ${ticket.tag}`
-              } else if (ticket.requestor.toLowerCase().includes(searchTerm)) {
-                matchingAttribute = `Requestor: ${ticket.requestor}`
-              } else if (ticket.id.toString().includes(searchTerm)) {
-                matchingAttribute = `ID: ${ticket.id}` // Show ID if it matches
-              }
+          {filteredTickets.map(ticket => {
+            const searchTerm = formik.values.searchTerm.toLowerCase()
+            let matchingAttribute = ""
 
-              return (
-                <tr key={ticket.id}>
-                  <td>{ticket.id}</td>
-                  <td>{matchingAttribute}</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+            // Determine the matching attribute
+            if (ticket.title.toLowerCase().includes(searchTerm)) {
+              matchingAttribute = `Title: ${ticket.title}`
+            } else if (ticket.requestor.username.toLowerCase().includes(searchTerm)) {
+              matchingAttribute = `Requestor: ${ticket.requestor.username}`
+            } else if (ticket.id.toString().includes(searchTerm)) {
+              matchingAttribute = `ID: ${ticket.id}`
+            } else if (ticket.tags.some(tag => tag.name.toLowerCase().includes(searchTerm))) {
+              const matchingTags = ticket.tags.filter(tag => tag.name.toLowerCase().includes(searchTerm)).map(tag => tag.name).join(", ")
+              matchingAttribute = `Tags: ${matchingTags}`
+            }
+
+            return (
+              <div key={ticket.id} className="ticket-row">
+                <div className="ticket-cell">{ticket.id}</div>
+                <div className="ticket-cell">{ticket.title}</div>
+                <div className="ticket-cell">{matchingAttribute}</div>
+              </div>
+            )
+          })}
+        </div>
       )}
     </div>
   )
 }
 
 export default SearchBar
+
+
+
 
