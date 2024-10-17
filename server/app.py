@@ -469,8 +469,8 @@ class QueueByTicketID(Resource):
 # Tag : get, post
 class Tags(Resource):
     def get(self):
-        tags = Tag.query.all()
-        return [tag.to_dict() for tag in tags], 200
+        tags = [tag.name for tag in Tag.query.all()]
+        return tags, 200
 
     def post(self):
         data = request.get_json()

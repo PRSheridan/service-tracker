@@ -8,7 +8,7 @@ from faker import Faker
 
 # Local imports
 from app import app
-from models import db, User, Ticket, Queue, Comment
+from models import db, User, Ticket, Queue, Comment, Tag  # Import Tag model
 
 if __name__ == '__main__':
     fake = Faker()
@@ -20,6 +20,7 @@ if __name__ == '__main__':
         Ticket.query.delete()
         Queue.query.delete()
         Comment.query.delete()
+        Tag.query.delete()  # Clear existing tags
 
         # Create queues
         queues = []
@@ -46,6 +47,19 @@ if __name__ == '__main__':
 
         db.session.commit()
 
+        # Create random unique tags
+        tag_names = set()  # Use a set to ensure unique tag names
+        while len(tag_names) < 20:
+            tag_names.add(fake.word())
+
+        tags = []
+        for tag_name in tag_names:
+            tag = Tag(name=tag_name)
+            tags.append(tag)
+            db.session.add(tag)
+
+        db.session.commit()
+
         # Create tickets
         for _ in range(20):
             ticket = Ticket(
@@ -59,6 +73,7 @@ if __name__ == '__main__':
                 status=choice(['new', 'in-progress', 'closed'])
             )
             ticket.queues = sample(queues, k=randint(1, 3))
+            ticket.tags = sample(tags, k=randint(1, 5))  # Assign 1-5 random tags
             db.session.add(ticket)
 
             db.session.commit()

@@ -26,7 +26,7 @@ function Ticket() {
         setQueues(data.queues)
         setTags(data.tags)
       })
-  }, [ticket.id, showCommentForm, showQueueForm])
+  }, [ticket.id, showCommentForm, showQueueForm, showTagForm])
 
   function deleteTicket() {
     fetch(`/ticket/${ticket.id}`, {
@@ -87,7 +87,7 @@ function Ticket() {
     return (
       <>
         {tags.map(tag => (
-          <div key={tag.id} className="queue-bubble">
+          <div key={tag.id} className="tag-bubble">
             {tag.name}
             {user.role !== 'client' && (
               <button className="button delete-tag" onClick={() => deleteTag(tag.id)}>Delete</button>
@@ -95,7 +95,7 @@ function Ticket() {
           </div>
         ))}
         {user.role !== 'client' && (
-          <div className="queue-bubble add-queue-bubble" onClick={() => setShowTagForm(!showTagForm)}>
+          <div className="tag-bubble add-tag-bubble" onClick={() => setShowTagForm(!showTagForm)}>
             Add tag
           </div>
         )}
@@ -208,5 +208,6 @@ function Ticket() {
 }
 
 export default Ticket
+
 
   
