@@ -3,7 +3,7 @@ import Home from "./pages/Home.js"
 import Profile from "./pages/Profile.js"
 import Ticket from "./pages/Ticket.js"
 import ModifyTicketForm from "./forms/ModifyTicketForm.js"
-import NewTicketForm from "./forms/NewTicketForm.js"
+import TicketForm from "./forms/TicketForm.js"
 import ModifyUserForm from "./forms/ModifyUserForm.js"
 import ModifyPasswordForm from "./forms/ModifyPasswordForm.js"
 
@@ -35,7 +35,7 @@ const routes = [
         },
         {
           path: "/new_ticket",
-          element: <NewTicketForm />
+          element: <TicketForm />
         },
         {
           path: "/modify_ticket/:id",

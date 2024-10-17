@@ -3,7 +3,7 @@ import { useNavigate, useOutletContext } from "react-router-dom"
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 
-function NewTicketForm() {
+function TicketForm() {
   const [errors, setErrors] = useState([])
   const [queues, setQueues] = useState([])
 
@@ -134,5 +134,5 @@ function NewTicketForm() {
   )
 }
 
-export default NewTicketForm
+export default TicketForm
 

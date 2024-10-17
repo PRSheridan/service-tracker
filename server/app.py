@@ -379,45 +379,6 @@ class CommentsByTicketID(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
 
-
-class QueueByTicketID(Resource):
-    def post(self, ticket_id):
-        data = request.get_json()
-
-        queue = Queue.query.filter(Queue.name == data['name']).one_or_none()
-        if queue is None:
-            return {'error': 'Queue not found'}, 404
-        
-        ticket = Ticket.query.filter(Ticket.id == ticket_id).one_or_none()
-        if ticket is None:
-            return {'error': 'Ticket not found'}, 404
-        
-        try:
-            ticket.queues.append(queue)
-            db.session.commit()
-            return '', 201
-
-        except Exception as e:
-            return {'error': str(e)}, 400
-        
-    def delete(self, ticket_id):
-        queue_id = request.get_json()
-        queue = Queue.query.filter(Queue.id == queue_id).one_or_none()
-        if queue is None:
-            return {'error': 'Queue not found'}, 404
-        
-        ticket = Ticket.query.filter(Ticket.id == ticket_id).one_or_none()
-        if ticket is None:
-            return {'error': 'Ticket not found'}, 404
-        
-        try:
-            ticket.queues.remove(queue)
-            db.session.commit()
-            return '', 204
-        
-        except Exception as e:
-            return {'error': str(e)}, 400
-
 # Queue : get, post
 class Queues(Resource):
     def get(self):
@@ -466,6 +427,44 @@ class QueueByID(Resource):
         db.session.delete(queue)
         db.session.commit()
         return '', 204
+    
+class QueueByTicketID(Resource):
+    def post(self, ticket_id):
+        data = request.get_json()
+
+        queue = Queue.query.filter(Queue.name == data['name']).one_or_none()
+        if queue is None:
+            return {'error': 'Queue not found'}, 404
+        
+        ticket = Ticket.query.filter(Ticket.id == ticket_id).one_or_none()
+        if ticket is None:
+            return {'error': 'Ticket not found'}, 404
+        
+        try:
+            ticket.queues.append(queue)
+            db.session.commit()
+            return '', 201
+
+        except Exception as e:
+            return {'error': str(e)}, 400
+        
+    def delete(self, ticket_id):
+        queue_id = request.get_json()
+        queue = Queue.query.filter(Queue.id == queue_id).one_or_none()
+        if queue is None:
+            return {'error': 'Queue not found'}, 404
+        
+        ticket = Ticket.query.filter(Ticket.id == ticket_id).one_or_none()
+        if ticket is None:
+            return {'error': 'Ticket not found'}, 404
+        
+        try:
+            ticket.queues.remove(queue)
+            db.session.commit()
+            return '', 204
+        
+        except Exception as e:
+            return {'error': str(e)}, 400
 
 # Tag : get, post
 class Tags(Resource):
@@ -495,6 +494,44 @@ class TagByID(Resource):
         db.session.delete(tag)
         db.session.commit()
         return '', 204
+    
+class TagByTicketID(Resource):
+    def post(self, ticket_id):
+        data = request.get_json()
+
+        tag = Tag.query.filter(Tag.name == data['name']).one_or_none()
+        if tag is None:
+            return {'error': 'Tag not found'}, 404
+        
+        ticket = Ticket.query.filter(Ticket.id == ticket_id).one_or_none()
+        if ticket is None:
+            return {'error': 'Ticket not found'}, 404
+        
+        try:
+            ticket.tags.append(tag)
+            db.session.commit()
+            return '', 201
+
+        except Exception as e:
+            return {'error': str(e)}, 400
+        
+    def delete(self, ticket_id):
+        tag_id = request.get_json()
+        tag = Tag.query.filter(Tag.id == tag_id).one_or_none()
+        if tag is None:
+            return {'error': 'Tag not found'}, 404
+        
+        ticket = Ticket.query.filter(Ticket.id == ticket_id).one_or_none()
+        if ticket is None:
+            return {'error': 'Ticket not found'}, 404
+        
+        try:
+            ticket.tags.remove(tag)
+            db.session.commit()
+            return '', 204
+        
+        except Exception as e:
+            return {'error': str(e)}, 400
 
 # Image : post
 def validate_image(stream):
@@ -577,11 +614,12 @@ api.add_resource(TicketByID, '/ticket/<int:ticket_id>')
 api.add_resource(TicketBySearchQuery, '/tickets/search')
 api.add_resource(CommentByID, '/comment/<int:comment_id>')
 api.add_resource(CommentsByTicketID, '/tickets/<int:ticket_id>/comments')
-api.add_resource(QueueByTicketID, '/ticket/<int:ticket_id>/queue/')
 api.add_resource(Queues, '/queues')
 api.add_resource(QueueByID, '/queue/<int:queue_id>')
-api.add_resource(Tags, '/tag')
+api.add_resource(QueueByTicketID, '/ticket/<int:ticket_id>/queue/')
+api.add_resource(Tags, '/tags')
 api.add_resource(TagByID, '/tag/<int:tag_id>')
+api.add_resource(TagByTicketID, '/ticket/<int:ticket_id>/tag/')
 api.add_resource(Images, '/image')
 api.add_resource(ImageByID, '/image/<int:image_id>')
 

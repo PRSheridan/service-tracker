@@ -2,28 +2,27 @@ import React, { useState, useEffect } from 'react'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 
-function NewQueueForm({ ticket, onClose }) {
+function TagForm({ ticket, onClose }) {
   const [errors, setErrors] = useState([])
-  const [queues, setQueues] = useState([])
+  const [tags, setTags] = useState([])
 
   useEffect(() => {
-    fetch(`/queues`)
+    fetch(`/tags`)
       .then(response => response.json())
       .then(data => {
-        setQueues(data)
+        setTags(data)
       })
   }, [])
 
   const formSchema = yup.object().shape({
-    name: yup.string().required("Select a queue to add").max(256, "Name must be less than 256 characters"),
+    name: yup.string().required("Select a tag to add").max(64, "Name must be less than 64 characters"),
   })
 
   const formik = useFormik({
     initialValues: { name: "" },
     validationSchema: formSchema,
     onSubmit: (values) => {
-      const url = ticket ? `/ticket/${ticket.id}/queue` : '/user/queues'
-      fetch(url, {
+      fetch(`/ticket/${ticket.id}/tag`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values, null, 1),
@@ -44,8 +43,8 @@ function NewQueueForm({ ticket, onClose }) {
           autoComplete="off"
           value={formik.values.name}
           onChange={formik.handleChange}>
-          {queues.map((queue) => (
-            <option value={queue} key={queue}>{queue}</option>
+          {tags.map((tag) => (
+            <option value={tag} key={tag}>{tag}</option>
           ))}
         </select>
         <div className="button-container">
@@ -57,6 +56,4 @@ function NewQueueForm({ ticket, onClose }) {
   )
 }
 
-export default NewQueueForm
-
-
+export default TagForm

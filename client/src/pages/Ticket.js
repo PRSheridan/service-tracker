@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import CommentForm from "../forms/CommentForm.js"
-import NewQueueForm from "../forms/NewQueueForm.js"
-import NewTagForm from "../forms/NewTagForm.js"
+import QueueForm from "../forms/QueueForm.js"
+import TagForm from "../forms/TagForm.js"
 
 function Ticket() {
   const navigate = useNavigate()
@@ -43,7 +43,7 @@ function Ticket() {
     fetch(`/ticket/${ticket.id}/queue/`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: queueID })
+      body: JSON.stringify(queueID)
     }).then((response) => {
       if (response.ok) {
         setQueues(queues.filter((queue) => queue.id !== queueID))
@@ -55,7 +55,7 @@ function Ticket() {
     fetch(`/ticket/${ticket.id}/tag/`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: tagID })
+      body: JSON.stringify(tagID)
     }).then((response) => {
       if (response.ok) {
         setTags(tags.filter((tag) => tag.id !== tagID))
@@ -149,7 +149,7 @@ function Ticket() {
                 {renderQueues()}
               </div>
               {showQueueForm && user.role !== 'client' && (
-                <NewQueueForm onClose={() => setShowQueueForm(false)} ticket={ticket} />
+                <QueueForm onClose={() => setShowQueueForm(false)} ticket={ticket} />
               )}
             </div>
 
@@ -160,7 +160,7 @@ function Ticket() {
                 {renderTags()}
               </div>
               {showTagForm && user.role !== 'client' && (
-                <NewTagForm onClose={() => setShowTagForm(false)} ticket={ticket} />
+                <TagForm onClose={() => setShowTagForm(false)} ticket={ticket} />
               )}
             </div>
 

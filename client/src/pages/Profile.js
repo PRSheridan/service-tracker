@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate, useOutletContext } from "react-router-dom"
-import NewQueueForm from "../forms/NewQueueForm"
+import QueueForm from "../forms/QueueForm"
 
 function Profile() {
   const navigate = useNavigate()
@@ -72,7 +72,7 @@ function Profile() {
             </div>
           </div>
           {showQueueForm && (
-            <NewQueueForm onClose={() => setShowQueueForm(false)} />
+            <QueueForm onClose={() => setShowQueueForm(false)} />
           )}
         </div>
       }
