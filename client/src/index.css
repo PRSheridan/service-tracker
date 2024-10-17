@@ -367,11 +367,8 @@ a {
   margin: 5px 0;
 }
 
-.search-box {
-  margin: 10px;
-}
-
 #searchbar {
+  margin-left: 18%;
   margin-bottom: 15px;
 }
 
@@ -448,6 +445,24 @@ a {
   text-decoration: underline;
 }
 
+.autocomplete-results {
+  border: 1px solid #ccc;
+  background: rgba(70, 70, 70, .97);
+  color: white;
+  position: absolute;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.autocomplete-option {
+  padding: 4px;
+  cursor: pointer;
+}
+
+.autocomplete-option:hover {
+  background-color: rgba(90, 90, 90, 1);
+}
+
 
 /* Comments Section */
 .comment {
@@ -511,9 +526,10 @@ a {
 input,
 select,
 textarea {
-  width: 98%;
+  width: 60%;
   padding: 8px;
   margin-bottom: 4px;
+  margin-right: 4px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -522,6 +538,7 @@ textarea {
 .button-container {
   display: flex;
   gap: 10px;
+  margin-left: 8px;
 }
 
 .user-profile {

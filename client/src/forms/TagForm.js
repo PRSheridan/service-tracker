@@ -5,6 +5,7 @@ import * as yup from 'yup'
 function TagForm({ ticket, onClose }) {
   const [errors, setErrors] = useState([])
   const [tags, setTags] = useState([])
+  const [filteredTags, setFilteredTags] = useState([])
 
   useEffect(() => {
     fetch(`/tags`)
@@ -33,20 +34,41 @@ function TagForm({ ticket, onClose }) {
     },
   })
 
+  const handleInputChange = (e) => {
+    const value = e.target.value.toLowerCase()
+    formik.setFieldValue("name", value)
+    setFilteredTags(tags.filter(tag => tag.toLowerCase().includes(value)))
+  }
+
+  const handleTagSelect = (tag) => {
+    formik.setFieldValue("name", tag)
+    setFilteredTags([])
+  }
+
   return (
     <div className="new-form">
       <form onSubmit={formik.handleSubmit}>
         <div className="error">{formik.errors.name}</div>
-        <select
+        <input
           type="text"
           id="name"
           autoComplete="off"
           value={formik.values.name}
-          onChange={formik.handleChange}>
-          {tags.map((tag) => (
-            <option value={tag} key={tag}>{tag}</option>
-          ))}
-        </select>
+          onChange={handleInputChange}
+          onFocus={() => setFilteredTags(tags.filter(tag => tag.toLowerCase().includes(formik.values.name.toLowerCase())))}
+        />
+        {filteredTags.length > 0 && (
+          <div className="autocomplete-results">
+            {filteredTags.map((tag) => (
+              <div 
+                key={tag} 
+                className="autocomplete-option" 
+                onClick={() => handleTagSelect(tag)}>
+                {tag}
+              </div>
+            ))}
+          </div>
+        )}
         <div className="button-container">
           <button className="button" type="submit">Submit</button>
           <button className="button" type="button" onClick={onClose}>Cancel</button>
@@ -57,3 +79,4 @@ function TagForm({ ticket, onClose }) {
 }
 
 export default TagForm
+

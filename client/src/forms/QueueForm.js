@@ -5,6 +5,7 @@ import * as yup from 'yup'
 function QueueForm({ ticket, onClose }) {
   const [errors, setErrors] = useState([])
   const [queues, setQueues] = useState([])
+  const [filteredQueues, setFilteredQueues] = useState([])
 
   useEffect(() => {
     fetch(`/queues`)
@@ -34,20 +35,41 @@ function QueueForm({ ticket, onClose }) {
     },
   })
 
+  const handleInputChange = (e) => {
+    const value = e.target.value.toLowerCase()
+    formik.setFieldValue("name", value)
+    setFilteredQueues(queues.filter(queue => queue.toLowerCase().includes(value)))
+  }
+
+  const handleQueueSelect = (queue) => {
+    formik.setFieldValue("name", queue)
+    setFilteredQueues([])
+  }
+
   return (
     <div className="new-form">
       <form onSubmit={formik.handleSubmit}>
         <div className="error">{formik.errors.name}</div>
-        <select
+        <input
           type="text"
           id="name"
           autoComplete="off"
           value={formik.values.name}
-          onChange={formik.handleChange}>
-          {queues.map((queue) => (
-            <option value={queue} key={queue}>{queue}</option>
-          ))}
-        </select>
+          onChange={handleInputChange}
+          onFocus={() => setFilteredQueues(queues.filter(queue => queue.toLowerCase().includes(formik.values.name.toLowerCase())))}
+        />
+        {filteredQueues.length > 0 && (
+          <div className="autocomplete-results">
+            {filteredQueues.map((queue) => (
+              <div 
+                key={queue} 
+                className="autocomplete-option" 
+                onClick={() => handleQueueSelect(queue)}>
+                {queue}
+              </div>
+            ))}
+          </div>
+        )}
         <div className="button-container">
           <button className="button" type="submit">Submit</button>
           <button className="button" type="button" onClick={onClose}>Cancel</button>
@@ -58,5 +80,3 @@ function QueueForm({ ticket, onClose }) {
 }
 
 export default QueueForm
-
-

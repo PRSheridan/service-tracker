@@ -20,14 +20,12 @@ function SearchBar() {
     validationSchema: formSchema,
     onSubmit: (values) => {
       const searchTerm = values.searchTerm.toLowerCase()
-      console.log("Searching for:", searchTerm) // Debug log for search term
 
       // Fetch tickets matching the search term
       fetch(`/tickets/search?q=${searchTerm}`)
         .then(response => {
           if (response.ok) { response.json()
             .then(data => {
-              console.log("Filtered results from backend:", data) // Debug log for filtered results
               if (data.length === 0) {
                 setErrors(["No matching tickets found"])
                 setFilteredTickets([])
