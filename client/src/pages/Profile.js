@@ -8,7 +8,7 @@ function Profile() {
   const [showQueueForm, setShowQueueForm] = useState(false)
 
   useEffect(() => {
-    fetch("/user")
+    fetch(`/user/${user.id}`)
       .then((response) => {
         if (response.ok) {
           response.json().then((updated_user) => setUser(updated_user))

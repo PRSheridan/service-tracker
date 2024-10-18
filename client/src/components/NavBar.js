@@ -12,6 +12,7 @@ function NavBar({ user, setUser }) {
     <nav id="navbar">
       <NavLink to="/home" className="nav-link nav-button">Home</NavLink>
       <NavLink to="/new_ticket" className="nav-link nav-button">New Ticket</NavLink>
+      {user.role == 'admin' && <NavLink to="/admin" className="nav-link nav-button">Admin</NavLink>}
       <NavLink to="/profile" className="nav-link nav-button">Profile</NavLink>
       {user && <div className="username-nav in-line">{user.username}</div>}
       <NavLink className="nav-link nav-button" onClick={handleLogoutClick}>Logout</NavLink>

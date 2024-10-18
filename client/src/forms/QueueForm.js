@@ -38,7 +38,7 @@ function QueueForm({ ticket, onClose }) {
   const handleInputChange = (e) => {
     const value = e.target.value.toLowerCase()
     formik.setFieldValue("name", value)
-    setFilteredQueues(queues.filter(queue => queue.toLowerCase().includes(value)))
+    setFilteredQueues(queues.filter(queue => queue.name.toLowerCase().includes(value)))
   }
 
   const handleQueueSelect = (queue) => {
@@ -56,7 +56,7 @@ function QueueForm({ ticket, onClose }) {
           autoComplete="off"
           value={formik.values.name}
           onChange={handleInputChange}
-          onFocus={() => setFilteredQueues(queues.filter(queue => queue.toLowerCase().includes(formik.values.name.toLowerCase())))}
+          onFocus={() => setFilteredQueues(queues.filter(queue => queue.name.toLowerCase().includes(formik.values.name.toLowerCase())))}
         />
         {filteredQueues.length > 0 && (
           <div className="autocomplete-results">

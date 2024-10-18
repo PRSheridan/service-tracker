@@ -6,6 +6,7 @@ import ModifyTicketForm from "./forms/ModifyTicketForm.js"
 import TicketForm from "./forms/TicketForm.js"
 import ModifyUserForm from "./forms/ModifyUserForm.js"
 import ModifyPasswordForm from "./forms/ModifyPasswordForm.js"
+import Admin from "./pages/Admin.js"
 
 
 const routes = [
@@ -41,6 +42,10 @@ const routes = [
           path: "/modify_ticket/:id",
           element: <ModifyTicketForm />
         },
+        {
+          path: "/admin/",
+          element: <Admin />
+        }
       ]
     },
 ];

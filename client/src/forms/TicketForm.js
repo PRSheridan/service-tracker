@@ -64,7 +64,7 @@ function TicketForm() {
           value={formik.values.queue}
           onChange={formik.handleChange}>
           {queues.map((queue) => (
-            <option value={queue} key={queue}>{queue}</option>
+            <option value={queue.name} key={queue.name}>{queue.name}</option>
           ))}
         </select>
         <div className="error">{formik.errors.requestor}</div>

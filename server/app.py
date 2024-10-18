@@ -81,16 +81,19 @@ class Logout(Resource):
     
 class Users(Resource):
     def get(self):
-        user = User.query.filter(User.id == session['user_id']).one_or_none()
+        users = User.query.all()
+    
+        return [user.to_dict() for user in users], 200
+    
+# UserByID : get, post, delete
+class UserByID(Resource):
+    def get(self, user_id):
+        user = User.query.filter(User.id == user_id).one_or_none()
         if user is None:
             return {'error': 'User not found'}, 404
     
         return user.to_dict(), 200
-    
-# THIS IS AN ABSOLUTE DISASTER PLEASE HELP ME GOD
 
-# UserByID : get, post, delete
-class UserByID(Resource):
     def put(self, user_id):
         user = User.query.filter(User.id == user_id).one_or_none()
         if user is None:
@@ -382,8 +385,8 @@ class CommentsByTicketID(Resource):
 # Queue : get, post
 class Queues(Resource):
     def get(self):
-        queues = [queue.name for queue in Queue.query.all()]
-        return queues, 200
+        queues = Queue.query.all()
+        return [queue.to_dict() for queue in queues], 200
 
     def post(self):
         data = request.get_json()
@@ -469,12 +472,13 @@ class QueueByTicketID(Resource):
 # Tag : get, post
 class Tags(Resource):
     def get(self):
-        tags = [tag.name for tag in Tag.query.all()]
-        return tags, 200
+        tags = Tag.query.all()
+        return [tag.to_dict() for tag in tags], 200
 
     def post(self):
         data = request.get_json()
-
+        print(data)
+        print(data['name'])
         try:
             new_tag = Tag(name=data['name'])
             db.session.add(new_tag)
@@ -604,7 +608,7 @@ api.add_resource(CheckSession, '/check_session')
 api.add_resource(Signup, '/signup')
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
-api.add_resource(Users, '/user')
+api.add_resource(Users, '/users')
 api.add_resource(UserByID, '/user/<int:user_id>')
 api.add_resource(UserQueues, '/user/queues')
 api.add_resource(UserQueueByID, '/user/queue/<int:queue_id>')

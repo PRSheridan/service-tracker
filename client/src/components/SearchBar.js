@@ -1,10 +1,12 @@
 import React, { useContext, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { useFormik } from "formik"
 import * as yup from "yup"
 import UserContext from "../context"
 
 function SearchBar() {
   const user = useContext(UserContext)
+  const navigate = useNavigate()
   const [filteredTickets, setFilteredTickets] = useState([])
   const [errors, setErrors] = useState([])
 
@@ -99,7 +101,8 @@ function SearchBar() {
             }
 
             return (
-              <div key={ticket.id} className="ticket-row">
+              <div key={ticket.id} className="ticket-row"
+                   onClick={() => navigate(`/ticket/${ticket.id}`, { state: { ticket, user } })}>
                 <div className="ticket-cell">{ticket.id}</div>
                 <div className="ticket-cell">{ticket.title}</div>
                 <div className="ticket-cell">{matchingAttribute}</div>
