@@ -72,6 +72,19 @@ function ModifyTicketForm() {
           value={formik.values.phone}
           onChange={formik.handleChange}
         />
+        <div className="error">{formik.errors.priority}</div>
+        <div className="ticket-field">Priority:</div>
+        <select
+          type="text"
+          id="priority"
+          autoComplete="off"
+          value={formik.values.priority}
+          onChange={formik.handleChange}
+        >
+          <option value="low">low</option>
+          <option value="medium">medium</option>
+          <option value="high">high</option>
+        </select>
         <div className="error">{formik.errors.title}</div>
         <div className="ticket-field">Title:</div>
         <input
@@ -91,19 +104,6 @@ function ModifyTicketForm() {
           rows="4"
           cols="50"
         />
-        <div className="error">{formik.errors.priority}</div>
-        <div className="ticket-field">Priority:</div>
-        <select
-          type="text"
-          id="priority"
-          autoComplete="off"
-          value={formik.values.priority}
-          onChange={formik.handleChange}
-        >
-          <option value="low">low</option>
-          <option value="medium">medium</option>
-          <option value="high">high</option>
-        </select>
         <div className="button-container">
           <button className="button" type="submit">Update Ticket</button>
           <button className="button" onClick={() => navigate(`/ticket/${ticket.id}`, { state: { ticket: ticket, user: user } })}>Cancel</button>

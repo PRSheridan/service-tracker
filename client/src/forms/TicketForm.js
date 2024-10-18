@@ -23,9 +23,9 @@ function TicketForm() {
     requestor: yup.string().required("Requestor ID is required"),
     email: yup.string().email("Invalid email format").required("Email is required"),
     phone: yup.string().nullable(),
+    priority: yup.string().required("Priority is required"),
     title: yup.string().required("Title is required"),
     description: yup.string().required("Description is required"),
-    priority: yup.string().required("Priority is required"),
   })
 
   const formik = useFormik({
@@ -34,9 +34,9 @@ function TicketForm() {
       requestor: user.username,
       email: user.email,
       phone: user.phone,
+      priority: 'low',
       title: '',
       description: '',
-      priority: 'low',
     },
     validationSchema: formSchema,
     onSubmit: (values) => {
@@ -94,6 +94,18 @@ function TicketForm() {
           value={formik.values.phone}
           onChange={formik.handleChange}
         />
+        <div className="error">{formik.errors.priority}</div>
+        <div className="ticket-field">Priority:</div>
+        <select
+          type="text"
+          id="priority"
+          autoComplete="off"
+          value={formik.values.priority}
+          onChange={formik.handleChange}>
+          <option value="low">low</option>
+          <option value="medium">medium</option>
+          <option value="high">high</option>
+        </select>
         <div className="error">{formik.errors.title}</div>
         <div className="ticket-field">Title:</div>
         <input
@@ -113,18 +125,16 @@ function TicketForm() {
           rows="4"
           cols="50"
         />
-        <div className="error">{formik.errors.priority}</div>
-        <div className="ticket-field">Priority:</div>
-        <select
-          type="text"
-          id="priority"
+        <div className="error">{formik.errors.description}</div>
+        <div className="ticket-field">Description:</div>
+        <textarea
+          id="description"
           autoComplete="off"
-          value={formik.values.priority}
-          onChange={formik.handleChange}>
-          <option value="low">low</option>
-          <option value="medium">medium</option>
-          <option value="high">high</option>
-        </select>
+          value={formik.values.description}
+          onChange={formik.handleChange}
+          rows="4"
+          cols="50"
+        />
         <div className="button-container">
           <button className="button" type="submit">Create Ticket</button>
           <button className="button" onClick={() => navigate("/home")}>Cancel</button>

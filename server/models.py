@@ -151,7 +151,6 @@ class Image(db.Model, SerializerMixin):
     )
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
     file_path = db.Column(db.String, nullable=False)
     ticket_id = db.Column(db.Integer, db.ForeignKey('tickets.id'), nullable=False)
 

@@ -39,10 +39,11 @@ function CreateQueueForm({ onClose }) {
                 autoComplete="off"
                 value={ formik.values.name }
                 onChange={ formik.handleChange }
+                className="input-admin"
                 />
-            <div className="button-container">
-                <button className="button" type="submit">Submit</button>
-                <button className="button" onClick={() => onClose()}>Cancel</button>
+            <div className="button-container-admin">
+                <button className="button-admin" type="submit">Submit</button>
+                <button className="button-admin" onClick={() => onClose()}>Cancel</button>
             </div>
             {/*errors.length > 1 ? <div className="alert">{errors}</div> : <></>*/}
             </form>

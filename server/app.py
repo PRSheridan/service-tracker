@@ -548,39 +548,43 @@ def validate_image(stream):
 
 class Images(Resource):
     def post(self):
-        data = request.get_json()
-        info = request.form.get("info")
-        image_name = request.form.get("image_name")
-        image = request.files.get("image")
+        if 'image' not in request.files:
+            return {"error": "No file part"}, 400
 
-        try:
-            if secure_filename(image.filename) in [
-                img.file_path for img in Image.query.all()
-            ]:
-                unique_str = str(uuid.uuid4())[:8]
-                image.filename = f"{unique_str}_{image.filename}"
-                
-            filename = secure_filename(image.filename)
-            if filename:
-                file_ext = os.path.splitext(filename)[1]
-                if file_ext not in app.config[
-                    "UPLOAD_EXTENSIONS"
-                ] or file_ext != validate_image(image.stream):
-                    return {"error": "File type not supported"}, 400
+        image = request.files['image']  # Accessing the file from request.files
+        ticket_id = request.form.get('ticket_id')  # Get the ticket_id from the form data
 
+        if not image or image.filename == '':
+            return {"error": "No selected file"}, 400
+
+        filename = secure_filename(image.filename)
+        if filename:
+            # Debugging: Check upload path
+            if not os.path.exists(app.config["UPLOAD_PATH"]):
+                print(f"Upload path does not exist: {app.config['UPLOAD_PATH']}")
+                return {"error": "Upload path does not exist"}, 500
+            
+            if not os.access(app.config["UPLOAD_PATH"], os.W_OK):
+                print(f"Upload path is not writable: {app.config['UPLOAD_PATH']}")
+                return {"error": "Upload path is not writable"}, 500
+            
+            try:
+                print(f"Saving image: {filename}")
                 image.save(os.path.join(app.config["UPLOAD_PATH"], filename))
+            except Exception as e:
+                print(f"Error saving image: {e}")
+                return {"error": "Error saving image"}, 500
 
             new_image = Image(
-                name=data['name'],
-                file_path=data['file_path'],
-                ticket_id=data['ticket_id']
+                file_path=filename,
+                ticket_id=ticket_id
             )
+            
             db.session.add(new_image)
             db.session.commit()
             return new_image.to_dict(), 201
-        
-        except Exception as e:
-            return {'error': str(e)}, 400
+
+        return {"error": "File type not supported"}, 400
 
 # ImageByID : delete
 class ImageByID(Resource):

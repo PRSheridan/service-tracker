@@ -13,6 +13,7 @@ function Ticket() {
   const [comments, setComments] = useState(initialTicket.comments)
   const [queues, setQueues] = useState([])
   const [tags, setTags] = useState([])
+  const [images, setImages] = useState([])
   const [showCommentForm, setShowCommentForm] = useState(false)
   const [showQueueForm, setShowQueueForm] = useState(false)
   const [showTagForm, setShowTagForm] = useState(false)
@@ -25,8 +26,44 @@ function Ticket() {
         setComments(data.comments)
         setQueues(data.queues)
         setTags(data.tags)
+        setImages(data.images) // Set images here
       })
   }, [ticket.id, showCommentForm, showQueueForm, showTagForm])
+
+  function handleImageUpload(e) {
+    e.preventDefault()
+    const formData = new FormData()
+    const fileInput = e.target.elements.fileInput
+  
+    if (fileInput.files.length === 0) {
+      console.error("No file selected")
+      return
+    }
+  
+    formData.append("image", fileInput.files[0])
+    formData.append("ticket_id", ticket.id) // Send ticket number
+
+    console.log(formData)
+  
+    fetch('/image', {
+      method: "POST",
+      body: formData
+    }).then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      return response.json()
+    }).then(data => {
+      // Refresh the data without reloading the page
+      fetch(`/ticket/${ticket.id}`)
+        .then(res => res.json())
+        .then(data => {
+          setImages(data.images) // Update images from the fetched data
+        })
+    }).catch(error => {
+      console.error("Error uploading image:", error)
+    })
+  }
 
   function deleteTicket() {
     fetch(`/ticket/${ticket.id}`, {
@@ -198,7 +235,17 @@ function Ticket() {
             </div>
             <div className="ticket-section">
               <h2>Images</h2>
-              <p>{ticket.images}</p>
+              <form onSubmit={handleImageUpload}>
+                <div>
+                  <input type="file" name="fileInput" accept="image/*" />
+                </div>
+                <button type="submit">Add image</button>
+              </form>
+              <div className="images-container">
+                {images.map(image => (
+                  <img key={image.id} src={image.file_path} alt="Ticket" />
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -208,6 +255,7 @@ function Ticket() {
 }
 
 export default Ticket
+
 
 
   
