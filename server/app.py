@@ -246,7 +246,7 @@ class TicketByID(Resource):
             return ticket.to_dict(), 200
 
         except Exception as e:
-            print(str(e))  # Log the exception
+            print(str(e)) 
             return {'error': str(e)}, 400
 
     def delete(self, ticket_id):
@@ -254,6 +254,14 @@ class TicketByID(Resource):
         if ticket is None:
             return {'error': 'Ticket not found'}, 404
         
+        for image in ticket.images:
+            file_path = os.path.join(app.config["UPLOAD_PATH"], image.file_path)
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except OSError as e:
+                    return {'error': f'Error deleting file: {e}'}, 500
+
         db.session.delete(ticket)
         db.session.commit()
         return '', 204
@@ -596,21 +604,30 @@ class ImagesByTicketID(Resource):
 
         memory_file.seek(0)
 
-        return send_file(memory_file, download_name='images.zip', as_attachment=True)
+        return send_file(memory_file, download_name='images.zip', as_attachment=True)       
 
-    
-    def delete(self, image_id):
-        image = Image.query.filter(Image.id == image_id).one_or_none()
-        path = image.file_path
+    def delete(self, ticket_id):
+        image_name = request.get_json()['image_name']
+        print(image_name)
+        image = Image.query.filter(Image.ticket_id == ticket_id and Image.file_path == image_name).one_or_none()
+
         if image is None:
             return {'error': 'Image not found'}, 404
-        
-        os.remove(os.path.join(path, image.filename))
-        
+
+        file_path = os.path.join(app.config["UPLOAD_PATH"], image.file_path)
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except OSError as e:
+                return {'error': f'Error deleting file: {e}'}, 500
+            
+        else:
+            return {'error': f'File not found at {file_path}'}, 404
+
         db.session.delete(image)
         db.session.commit()
-        return '', 204
-            
+
+        return '', 204     
 
 api.add_resource(CheckSession, '/check_session')
 api.add_resource(Signup, '/signup')

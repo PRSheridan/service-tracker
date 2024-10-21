@@ -116,6 +116,19 @@ function Ticket() {
     })
   }
 
+  function deleteImage(image_name) {
+    fetch(`/images/${ticket.id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image_name })
+    }).then((response) => {
+      if (response.ok) {
+        setImages(images.filter((image) => image.name !== image_name))
+      }
+    })
+  }
+  
+
   function renderQueues() {
     return (
       <>
@@ -265,13 +278,15 @@ function Ticket() {
 
               <div className="images-container">
                 {images.map((imageData, index) => (
-                  <div key={index}
-                    className="image-display"
-                    onClick={() => setOpenImage(imageData.url)}>
-                    <img className="image-thumb"
-                      src={imageData.url}
-                      alt={imageData.name} />
+                  <div key={index} className="image-display">
+                    <img onClick={() => setOpenImage(imageData.url)}
+                         className="image-thumb"
+                         src={imageData.url}
+                         alt={imageData.name} />
                     <p className="image-name">{imageData.name}</p>
+                    <button className="delete-button"
+                            onClick={() => deleteImage(imageData.name)}>Delete
+                    </button>
                   </div>
                 ))}
               </div>
