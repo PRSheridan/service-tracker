@@ -368,6 +368,93 @@ a {
   margin: 5px 0;
 }
 
+.ticket-section h2 {
+  margin-bottom: 15px;
+  font-size: 22px;
+  color: #333;
+}
+
+/* Image Upload Input */
+.image-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  color: rgba(51, 51, 51, 0.8);
+  margin-bottom: 15px;
+}
+
+.image-input::file-selector-button {
+  background-color: rgba(51, 51, 51, 0.8);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.image-input::file-selector-button:hover {
+  background-color: rgba(68, 68, 68, 0.8);
+}
+
+.images-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.image-display {
+  background-color: rgba(51, 51, 51, 0.8);
+  border-radius: 6px;
+  text-align: center;
+  transition: transform 0.3s;
+  width: 180px;
+  cursor: pointer;
+}
+
+.image-display:hover {
+  transform: scale(1.02);
+}
+
+.image-thumb {
+  width: 100%;
+  height: auto;
+}
+
+.image-name {
+  color: #fff;
+  font-size: 14px;
+}
+
+/* expand for Enlarged Image */
+.image-expand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+}
+
+.image-expand-content {
+  max-width: 80%;
+  max-height: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-expand-content img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
 #searchbar {
   margin-left: 18%;
   margin-bottom: 15px;

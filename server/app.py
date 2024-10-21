@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import imghdr, uuid, os
-from flask import request, session, make_response, send_from_directory
+import imghdr, uuid, os, io, zipfile
+from flask import request, session, make_response, send_file
 from flask_restful import Resource
 from werkzeug.utils import secure_filename
 from sqlalchemy import or_
@@ -558,16 +558,7 @@ class Images(Resource):
             return {"error": "No selected file"}, 400
 
         filename = secure_filename(image.filename)
-        if filename:
-            # Debugging: Check upload path
-            if not os.path.exists(app.config["UPLOAD_PATH"]):
-                print(f"Upload path does not exist: {app.config['UPLOAD_PATH']}")
-                return {"error": "Upload path does not exist"}, 500
-            
-            if not os.access(app.config["UPLOAD_PATH"], os.W_OK):
-                print(f"Upload path is not writable: {app.config['UPLOAD_PATH']}")
-                return {"error": "Upload path is not writable"}, 500
-            
+        if filename:         
             try:
                 print(f"Saving image: {filename}")
                 image.save(os.path.join(app.config["UPLOAD_PATH"], filename))
@@ -587,14 +578,26 @@ class Images(Resource):
         return {"error": "File type not supported"}, 400
 
 # ImageByID : delete
-class ImageByID(Resource):
-    def get(self, image_id):
-        image = Image.query.filter(Image.id == image_id).one_or_none()
-        path = image.file_path
-        if image is None:
-            return {'error': 'Image not found'}, 404
-        
-        return send_from_directory(app.config["UPLOAD_PATH"], path)
+class ImagesByTicketID(Resource):
+    def get(self, ticket_id):
+        images = Image.query.filter(Image.ticket_id == ticket_id).all()
+
+        if not images:
+            return {'error': 'No images found'}, 404
+
+        memory_file = io.BytesIO()
+        with zipfile.ZipFile(memory_file, 'w') as zf:
+            for image in images:
+                file_path = f"{app.config['UPLOAD_PATH']}/{image.file_path}"
+                if os.path.exists(file_path):
+                    zf.write(file_path, image.file_path)  # Add file to the zip using its relative path
+                else:
+                    return {'error': f'Image not found at {file_path}'}, 404
+
+        memory_file.seek(0)
+
+        return send_file(memory_file, download_name='images.zip', as_attachment=True)
+
     
     def delete(self, image_id):
         image = Image.query.filter(Image.id == image_id).one_or_none()
@@ -607,6 +610,7 @@ class ImageByID(Resource):
         db.session.delete(image)
         db.session.commit()
         return '', 204
+            
 
 api.add_resource(CheckSession, '/check_session')
 api.add_resource(Signup, '/signup')
@@ -629,7 +633,7 @@ api.add_resource(Tags, '/tags')
 api.add_resource(TagByID, '/tag/<int:tag_id>')
 api.add_resource(TagByTicketID, '/ticket/<int:ticket_id>/tag/')
 api.add_resource(Images, '/image')
-api.add_resource(ImageByID, '/image/<int:image_id>')
+api.add_resource(ImagesByTicketID, '/images/<int:ticket_id>')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

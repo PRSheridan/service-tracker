@@ -29,6 +29,7 @@ function QueueForm({ ticket, onClose }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values, null, 1),
       }).then((response) => {
+        console.log(queues)
         if (response.ok) { onClose() } 
         else { response.json().then((err) => setErrors(err.errors)) }
       })
@@ -62,10 +63,10 @@ function QueueForm({ ticket, onClose }) {
           <div className="autocomplete-results">
             {filteredQueues.map((queue) => (
               <div 
-                key={queue} 
+                key={queue.name} 
                 className="autocomplete-option" 
-                onClick={() => handleQueueSelect(queue)}>
-                {queue}
+                onClick={() => handleQueueSelect(queue.name)}>
+                {queue.name}
               </div>
             ))}
           </div>

@@ -37,7 +37,7 @@ function TagForm({ ticket, onClose }) {
   const handleInputChange = (e) => {
     const value = e.target.value.toLowerCase()
     formik.setFieldValue("name", value)
-    setFilteredTags(tags.filter(tag => tag.toLowerCase().includes(value)))
+    setFilteredTags(tags.filter(tag => tag.name.toLowerCase().includes(value)))
   }
 
   const handleTagSelect = (tag) => {
@@ -55,16 +55,16 @@ function TagForm({ ticket, onClose }) {
           autoComplete="off"
           value={formik.values.name}
           onChange={handleInputChange}
-          onFocus={() => setFilteredTags(tags.filter(tag => tag.toLowerCase().includes(formik.values.name.toLowerCase())))}
+          onFocus={() => setFilteredTags(tags.filter(tag => tag.name.toLowerCase().includes(formik.values.name.toLowerCase())))}
         />
         {filteredTags.length > 0 && (
           <div className="autocomplete-results">
             {filteredTags.map((tag) => (
               <div 
-                key={tag} 
+                key={tag.name} 
                 className="autocomplete-option" 
-                onClick={() => handleTagSelect(tag)}>
-                {tag}
+                onClick={() => handleTagSelect(tag.name)}>
+                {tag.name}
               </div>
             ))}
           </div>

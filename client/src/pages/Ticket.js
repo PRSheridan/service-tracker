@@ -4,6 +4,8 @@ import CommentForm from "../forms/CommentForm.js"
 import QueueForm from "../forms/QueueForm.js"
 import TagForm from "../forms/TagForm.js"
 
+import JSZip from 'jszip'
+
 function Ticket() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -17,6 +19,7 @@ function Ticket() {
   const [showCommentForm, setShowCommentForm] = useState(false)
   const [showQueueForm, setShowQueueForm] = useState(false)
   const [showTagForm, setShowTagForm] = useState(false)
+  const [openImage, setOpenImage] = useState(null)
 
   useEffect(() => {
     fetch(`/ticket/${ticket.id}`)
@@ -26,42 +29,55 @@ function Ticket() {
         setComments(data.comments)
         setQueues(data.queues)
         setTags(data.tags)
-        setImages(data.images) // Set images here
       })
+
+    fetch(`/images/${ticket.id}`)
+      .then(response => response.blob())
+      .then(blob => {
+        const zip = new JSZip()
+        return zip.loadAsync(blob)
+      })
+      .then(zip => {
+        const imagePromises = []
+        zip.forEach((relativePath, file) => {
+          imagePromises.push(
+            file.async("blob").then(content => {
+              const objectUrl = URL.createObjectURL(content)
+              return { url: objectUrl, name: relativePath }
+            })
+          )
+        })
+        return Promise.all(imagePromises)
+      })
+      .then(imageData => {
+        setImages(imageData)
+      })
+      .catch(err => {
+        console.error('Error fetching and unzipping images:', err)
+      })
+
   }, [ticket.id, showCommentForm, showQueueForm, showTagForm])
 
   function handleImageUpload(e) {
     e.preventDefault()
     const formData = new FormData()
     const fileInput = e.target.elements.fileInput
-  
+
     if (fileInput.files.length === 0) {
       console.error("No file selected")
       return
     }
-  
-    formData.append("image", fileInput.files[0])
-    formData.append("ticket_id", ticket.id) // Send ticket number
 
-    console.log(formData)
-  
+    formData.append("image", fileInput.files[0])
+    formData.append("ticket_id", ticket.id)
+
     fetch('/image', {
       method: "POST",
       body: formData
     }).then(response => {
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        return response.json()
       }
-      return response.json()
-    }).then(data => {
-      // Refresh the data without reloading the page
-      fetch(`/ticket/${ticket.id}`)
-        .then(res => res.json())
-        .then(data => {
-          setImages(data.images) // Update images from the fetched data
-        })
-    }).catch(error => {
-      console.error("Error uploading image:", error)
     })
   }
 
@@ -170,9 +186,9 @@ function Ticket() {
           <div className="ticket-main">
             <div className="ticket-section">
               <button className="button ticket-action"
-                      onClick={() => navigate(`/modify_ticket/${ticket.id}`, { state: { ticket, user } })}>Update</button>
+                onClick={() => navigate(`/modify_ticket/${ticket.id}`, { state: { ticket, user } })}>Update ticket</button>
               <button className="button ticket-action"
-                      onClick={deleteTicket}>Delete</button>
+                onClick={deleteTicket}>Delete ticket</button>
               <div className="ticket-details-extra">
                 <p><strong>Ticket ID:</strong> {ticket.id}</p>
                 <p><strong>Date:</strong> {ticket.date}</p>
@@ -216,7 +232,7 @@ function Ticket() {
               <div className="comments-header">
                 <h2>Comments</h2>
                 <button className="button add-comment"
-                        onClick={() => setShowCommentForm(!showCommentForm)}>New comment</button>
+                  onClick={() => setShowCommentForm(!showCommentForm)}>New comment</button>
               </div>
               <div className="comment-section">
                 {showCommentForm && (<CommentForm onClose={() => { setShowCommentForm(false) }} ticket={ticket} />)}
@@ -233,28 +249,51 @@ function Ticket() {
               <p><strong>Email:</strong> {ticket.email}</p>
               <p><strong>Phone:</strong> {ticket.phone}</p>
             </div>
+
+            {/* Image Section */}
             <div className="ticket-section">
               <h2>Images</h2>
               <form onSubmit={handleImageUpload}>
-                <div>
-                  <input type="file" name="fileInput" accept="image/*" />
-                </div>
-                <button type="submit">Add image</button>
+                <input
+                  type="file"
+                  name="fileInput"
+                  accept="image/*"
+                  className="image-input"
+                />
+                <button className="button" type="submit">Submit image</button>
               </form>
+
               <div className="images-container">
-                {images.map(image => (
-                  <img key={image.id} src={image.file_path} alt="Ticket" />
+                {images.map((imageData, index) => (
+                  <div key={index}
+                    className="image-display"
+                    onClick={() => setOpenImage(imageData.url)}>
+                    <img className="image-thumb"
+                      src={imageData.url}
+                      alt={imageData.name} />
+                    <p className="image-name">{imageData.name}</p>
+                  </div>
                 ))}
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Enlarged Image */}
+      {openImage && (
+        <div className="image-expand" onClick={() => setOpenImage(null)}>
+          <div className="image-expand-content">
+            <img src={openImage} alt="Enlarged" />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
 export default Ticket
+
 
 
 
