@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom"
 import CommentForm from "../forms/CommentForm.js"
 import QueueForm from "../forms/QueueForm.js"
 import TagForm from "../forms/TagForm.js"
-
 import JSZip from 'jszip'
 
 function Ticket() {
@@ -21,6 +20,7 @@ function Ticket() {
   const [showTagForm, setShowTagForm] = useState(false)
   const [openImage, setOpenImage] = useState(null)
 
+  // Fetch ticket data and images
   useEffect(() => {
     fetch(`/ticket/${ticket.id}`)
       .then(response => response.json())
@@ -29,8 +29,12 @@ function Ticket() {
         setComments(data.comments)
         setQueues(data.queues)
         setTags(data.tags)
+        getImages()
       })
+  }, [showCommentForm, showQueueForm, showTagForm])
 
+  // Fetch images for the ticket
+  function getImages() {
     fetch(`/images/${ticket.id}`)
       .then(response => response.blob())
       .then(blob => {
@@ -55,17 +59,16 @@ function Ticket() {
       .catch(err => {
         console.error('Error fetching and unzipping images:', err)
       })
+  }
 
-  }, [ticket.id, showCommentForm, showQueueForm, showTagForm])
-
+  // Handle image upload
   function handleImageUpload(e) {
     e.preventDefault()
     const formData = new FormData()
     const fileInput = e.target.elements.fileInput
 
     if (fileInput.files.length === 0) {
-      console.error("No file selected")
-      return
+      return console.error("No file selected")
     }
 
     formData.append("image", fileInput.files[0])
@@ -74,13 +77,20 @@ function Ticket() {
     fetch('/image', {
       method: "POST",
       body: formData
-    }).then(response => {
-      if (!response.ok) {
-        return response.json()
+    })
+    .then(response => {
+      if (response.ok) {
+        getImages()  // Refresh images after successful upload
+      } else {
+        console.error('Image upload failed:', response.statusText)
       }
+    })
+    .catch(err => {
+      console.error('Error uploading image:', err)
     })
   }
 
+  // Deletion functions
   function deleteTicket() {
     fetch(`/ticket/${ticket.id}`, {
       method: "DELETE",
@@ -127,8 +137,8 @@ function Ticket() {
       }
     })
   }
-  
 
+  // Render queue elements
   function renderQueues() {
     return (
       <>
@@ -149,6 +159,7 @@ function Ticket() {
     )
   }
 
+  // Render tag elements
   function renderTags() {
     return (
       <>
@@ -169,6 +180,7 @@ function Ticket() {
     )
   }
 
+  // Render comments
   function renderComments() {
     if (comments.length === 0) {
       return <div>No comments to display</div>

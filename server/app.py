@@ -608,8 +608,8 @@ class ImagesByTicketID(Resource):
 
     def delete(self, ticket_id):
         image_name = request.get_json()['image_name']
-        print(image_name)
-        image = Image.query.filter(Image.ticket_id == ticket_id and Image.file_path == image_name).one_or_none()
+        print(ticket_id, image_name)
+        image = Image.query.filter_by(ticket_id=ticket_id, file_path=image_name).one_or_none()
 
         if image is None:
             return {'error': 'Image not found'}, 404
