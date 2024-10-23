@@ -125,16 +125,6 @@ function TicketForm() {
           rows="4"
           cols="50"
         />
-        <div className="error">{formik.errors.description}</div>
-        <div className="ticket-field">Description:</div>
-        <textarea
-          id="description"
-          autoComplete="off"
-          value={formik.values.description}
-          onChange={formik.handleChange}
-          rows="4"
-          cols="50"
-        />
         <div className="button-container">
           <button className="button" type="submit">Create Ticket</button>
           <button className="button" onClick={() => navigate("/home")}>Cancel</button>

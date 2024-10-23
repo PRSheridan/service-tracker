@@ -13,19 +13,12 @@ from models import User, Ticket, Comment, Queue, Tag, Image
 def index():
     return '<h1>service-tracker-server</h1>'
 
-def validate_image(stream):
-    header = stream.read(512)
-    stream.seek(0)
-    format = imghdr.what(None, header)
-    if not format:
-        return None
-    return "." + (format if format != "jpeg" else "jpg")
-
 class CheckSession(Resource):
     def get(self):
         if session['user_id']:
             user = User.query.filter(User.id == session['user_id']).first().to_dict()
             return user, 200
+        
         return {'error': '401 Unauthorized Request'}, 401
 
 class Signup(Resource):
@@ -33,13 +26,13 @@ class Signup(Resource):
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
-        email = data.get('username')
-        phone = data.get('password')
+        email = data.get('email')
+        phone = data.get('phone')
         role = "client"
         passwordConfirm = data.get('passwordConfirm')
 
         if password != passwordConfirm:
-            return {'error': '401 Passwords do not match'}, 401
+            return {'error': '400 Passwords do not match'}, 400
 
         try:
             user = User(
@@ -177,7 +170,7 @@ class UserQueueByID(Resource):
         
         user.queues.remove(queue)
         db.session.commit()
-        return '', 201
+        return '', 204
     
 class UserTickets(Resource):
     def get(self):
@@ -196,11 +189,17 @@ class Tickets(Resource):
 
     def post(self):
         data = request.get_json()
-        print(data)
+        requestor = User.query.filter(User.username == data['requestor']).one_or_none()
+        if requestor is None:
+            return {'error': 'Requestor not found'}, 404
+        
+        queue = Queue.query.filter(Queue.name == data['queue']).one_or_none()
+        if queue is None:
+            return {'error': 'Queue not found'}, 404
 
         try:
             new_ticket = Ticket(
-                requestor_id=User.query.filter(User.username == data['requestor']).first().id,
+                requestor=requestor.id,
                 date=datetime.datetime.utcnow(),
                 email=data['email'],
                 phone=data['phone'],
@@ -209,7 +208,7 @@ class Tickets(Resource):
                 priority=data['priority'],
                 status='new'
             )
-            new_ticket.queues.append(Queue.query.filter(Queue.name == data['queue']).first())
+            new_ticket.queues.append(queue)
 
             db.session.add(new_ticket)
             db.session.commit()
@@ -367,11 +366,11 @@ class CommentByID(Resource):
     
 class CommentsByTicketID(Resource):
     def get(self, ticket_id):
-        comments = Ticket.query.filter(Ticket.id == ticket_id).first().comments
-        if comments is None:
+        ticket = Ticket.query.filter(Ticket.id == ticket_id).one_or_none()
+        if ticket is None:
             return {'error': 'No comments found'}, 404
         
-        return [comment.to_dict() for comment in comments], 200
+        return [comment.to_dict() for comment in ticket.comments], 200
 
     def post(self, ticket_id):
         data = request.get_json()

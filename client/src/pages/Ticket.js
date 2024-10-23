@@ -12,9 +12,10 @@ function Ticket() {
 
   const [ticket, setTicket] = useState(initialTicket)
   const [comments, setComments] = useState(initialTicket.comments)
-  const [queues, setQueues] = useState([])
-  const [tags, setTags] = useState([])
+  const [queues, setQueues] = useState(initialTicket.queues)
+  const [tags, setTags] = useState(initialTicket.tags)
   const [images, setImages] = useState([])
+  
   const [showCommentForm, setShowCommentForm] = useState(false)
   const [showQueueForm, setShowQueueForm] = useState(false)
   const [showTagForm, setShowTagForm] = useState(false)
@@ -29,9 +30,12 @@ function Ticket() {
         setComments(data.comments)
         setQueues(data.queues)
         setTags(data.tags)
-        getImages()
       })
   }, [showCommentForm, showQueueForm, showTagForm])
+
+  useEffect(() => {
+    getImages()
+  }, [])
 
   // Fetch images for the ticket
   function getImages() {
@@ -80,13 +84,13 @@ function Ticket() {
     })
     .then(response => {
       if (response.ok) {
-        getImages()  // Refresh images after successful upload
+        getImages()
       } else {
         console.error('Image upload failed:', response.statusText)
       }
     })
     .catch(err => {
-      console.error('Error uploading image:', err)
+      console.error('Image upload failed:', err)
     })
   }
 

@@ -20,6 +20,7 @@ class User(db.Model, SerializerMixin):
     )
 
     id = db.Column(db.Integer, primary_key=True)
+
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(128), nullable=False)
     phone = db.Column(db.String(20), nullable=True)
@@ -64,6 +65,7 @@ class Ticket(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     requestor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
     email = db.Column(db.String(128), nullable=False)
     phone = db.Column(db.String(20), nullable=True)
     title = db.Column(db.String(128), nullable=False)
@@ -78,18 +80,17 @@ class Ticket(db.Model, SerializerMixin):
     queues = db.relationship('Queue', secondary='ticket_queues', back_populates='tickets')
     images = db.relationship('Image', back_populates='ticket', cascade='all, delete-orphan')
 
-    @validates('priority')
-    def validate_role(self, key, priority):
-        if priority not in ['low', 'medium', 'high']:
-            raise ValueError("Priority must be 'low', 'medium', or 'high'.")
-        return priority
-    
     @validates('status')
-    def validate_role(self, key, status):
+    def validate_status(self, key, status):
         if status not in ['new', 'in-progress', 'closed']:
             raise ValueError("Status must be 'new', 'in-progress', or 'closed'.")
         return status
 
+    @validates('priority')
+    def validate_priority(self, key, priority):
+        if priority not in ['low', 'medium', 'high']:
+            raise ValueError("Priority must be 'low', 'medium', or 'high'.")
+        return priority
 
 # Queue Model
 class Queue(db.Model, SerializerMixin):
