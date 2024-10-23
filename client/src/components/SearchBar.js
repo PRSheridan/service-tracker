@@ -4,7 +4,7 @@ import { useFormik } from "formik"
 import * as yup from "yup"
 import UserContext from "../context"
 
-function SearchBar() {
+function SearchBar( {queues} ) {
   const user = useContext(UserContext)
   const navigate = useNavigate()
   const [filteredTickets, setFilteredTickets] = useState([])
@@ -102,7 +102,7 @@ function SearchBar() {
 
             return (
               <div key={ticket.id} className="ticket-row"
-                   onClick={() => navigate(`/ticket/${ticket.id}`, { state: { ticket, user } })}>
+                   onClick={() => navigate(`/ticket/${ticket.id}`, { state: { ticket, user , queues} })}>
                 <div className="ticket-cell">{ticket.id}</div>
                 <div className="ticket-cell">{ticket.title}</div>
                 <div className="ticket-cell">{matchingAttribute}</div>

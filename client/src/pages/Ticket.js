@@ -8,7 +8,7 @@ import JSZip from 'jszip'
 function Ticket() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, ticket: initialTicket } = location.state
+  const { user, ticket: initialTicket, queues: allQueues } = location.state
 
   const [ticket, setTicket] = useState(initialTicket)
   const [comments, setComments] = useState(initialTicket.comments)
@@ -227,7 +227,7 @@ function Ticket() {
                 {renderQueues()}
               </div>
               {showQueueForm && user.role !== 'client' && (
-                <QueueForm onClose={() => setShowQueueForm(false)} ticket={ticket} />
+                <QueueForm onClose={() => setShowQueueForm(false)} ticket={ticket} queues={allQueues} />
               )}
             </div>
 

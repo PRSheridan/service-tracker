@@ -5,7 +5,7 @@ import QueueDisplay from "../components/QueueDisplay"
 import SearchBar from "../components/SearchBar"
 
 function Home() {
-  const {user, setUser} = useOutletContext()
+  const {user, setUser, queues, setQueues} = useOutletContext()
   const [isLoading, setIsLoading] = useState(true)
   const [data, setData] = useState([])
 
@@ -28,7 +28,7 @@ function Home() {
         </div>
       ) : (
         <UserContext.Provider value={user}>
-            <SearchBar />
+            <SearchBar queues={queues}/>
             {user.role == "client" ? (
             <div className="client-tickets">
               <div className="queue-display-name">{user.username}'s tickets:</div>
@@ -42,7 +42,7 @@ function Home() {
             <div className="admin-queues">
               {data.length > 0 ? (
                 data.map((queue) => (
-                    <QueueDisplay key={queue.name} queue={queue} />
+                    <QueueDisplay key={queue.name} queue={queue} queues={queues} />
                 ))
               ) : (
                 <div>No queues to display.</div>

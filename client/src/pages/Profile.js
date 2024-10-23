@@ -4,7 +4,7 @@ import QueueForm from "../forms/QueueForm"
 
 function Profile() {
   const navigate = useNavigate()
-  const { user, setUser } = useOutletContext()
+  const { user, setUser, queues, setQueues } = useOutletContext()
   const [showQueueForm, setShowQueueForm] = useState(false)
 
   useEffect(() => {
@@ -72,7 +72,7 @@ function Profile() {
             </div>
           </div>
           {showQueueForm && (
-            <QueueForm onClose={() => setShowQueueForm(false)} />
+            <QueueForm queues={queues} onClose={() => setShowQueueForm(false)} />
           )}
         </div>
       }

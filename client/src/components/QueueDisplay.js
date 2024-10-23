@@ -2,7 +2,7 @@ import React, { useContext } from "react"
 import { useNavigate } from "react-router-dom"
 import UserContext from "../context"
 
-function QueueDisplay({ userTickets, queue }) {
+function QueueDisplay({ userTickets, queue, queues}) {
     const navigate = useNavigate()
     const user = useContext(UserContext)
 
@@ -17,7 +17,7 @@ function QueueDisplay({ userTickets, queue }) {
 
         return sortedTickets.map((ticket) => (
             <div key={ticket.id} className="ticket-row"
-                 onClick={() => navigate(`/ticket/${ticket.id}`, { state: { ticket, user } })}>
+                 onClick={() => navigate(`/ticket/${ticket.id}`, { state: { ticket, user, queues} })}>
                 <div className="ticket-cell">{ticket.id}</div>
                 <div className="ticket-cell">{ticket.title}</div>
                 <div className="ticket-cell">{ticket.requestor.username}</div>

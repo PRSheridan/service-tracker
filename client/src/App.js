@@ -5,6 +5,7 @@ import Login from "./pages/Login.js"
 
 function App() {
   const [user, setUser] = useState(null)
+  const [queues, setQueues] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -15,7 +16,13 @@ function App() {
          response.json().then((user) => setUser(user)) 
          navigate("/Home")
       }
-    })
+    }).then(
+      fetch("/queues")
+      .then((response) => {
+        response.json().then((queues) => setQueues(queues))
+        console.log(queues)
+      })
+    )
   }, [])
 
   if (!user) return <Login onLogin={setUser}/>
@@ -28,7 +35,7 @@ function App() {
         </div>
       </div>
       <div id="app-container">
-        <Outlet context={{user, setUser}} />
+        <Outlet context={{user, setUser, queues, setQueues}} />
       </div>
     </>
   )

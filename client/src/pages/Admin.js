@@ -1,19 +1,20 @@
 import { useEffect, useState } from 'react'
 import CreateQueueForm from "../forms/CreateQueueForm"
 import CreateTagForm from "../forms/CreateTagForm"
+import { useOutletContext } from 'react-router-dom'
 
 function Admin() {
   const [users, setUsers] = useState([])
-  const [queues, setQueues] = useState([])
+  const {queues, setQueues} = useOutletContext()
   const [tags, setTags] = useState([])
   const [showQueueForm, setShowQueueForm] = useState(false)
   const [showTagForm, setShowTagForm] = useState(false)
 
   useEffect(() => {
-    fetch('/users').then(res => res.json()).then(data => setUsers(data))
-    fetch('/queues').then(res => res.json()).then(data => setQueues(data))
-    fetch('/tags').then(res => res.json()).then(data => setTags(data))
-  }, [showTagForm, showQueueForm])
+    fetch('/users').then(response => response.json()).then(data => setUsers(data))
+    fetch('/tags').then(response => response.json()).then(data => setTags(data))
+    fetch('/queues').then(response => response.json()).then(data => setQueues(data))
+  }, [showTagForm,showQueueForm])
 
   function deleteUser(userID) {
     fetch(`/user/${userID}`, {

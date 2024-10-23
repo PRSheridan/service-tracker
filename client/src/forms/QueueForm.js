@@ -2,18 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { useFormik } from 'formik'
 import * as yup from 'yup'
 
-function QueueForm({ ticket, onClose }) {
+function QueueForm({ queues, ticket, onClose }) {
   const [errors, setErrors] = useState([])
-  const [queues, setQueues] = useState([])
   const [filteredQueues, setFilteredQueues] = useState([])
-
-  useEffect(() => {
-    fetch(`/queues`)
-      .then(response => response.json())
-      .then(data => {
-        setQueues(data)
-      })
-  }, [])
 
   const formSchema = yup.object().shape({
     name: yup.string().required("Select a queue to add").max(256, "Name must be less than 256 characters"),
