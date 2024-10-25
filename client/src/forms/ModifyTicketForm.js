@@ -11,7 +11,7 @@ function ModifyTicketForm() {
   const user = location.state.user
 
   const formSchema = yup.object().shape({
-    requestor: yup.string().required("Requestor ID is required"),
+    requestor: yup.string().required("Requestor username is required"),
     email: yup.string().email("Invalid email format").required("Email is required"),
     phone: yup.string().nullable(),
     title: yup.string().required("Title is required"),
@@ -45,7 +45,6 @@ function ModifyTicketForm() {
     <div className="new-form">
       <h2>Update ticket:</h2>
       <form onSubmit={formik.handleSubmit}>
-        <div className="error">{formik.errors.requestor}</div>
         <div className="ticket-field">Requestor:</div>
         <input
           type="text"
@@ -54,7 +53,8 @@ function ModifyTicketForm() {
           value={formik.values.requestor}
           onChange={formik.handleChange}
         />
-        <div className="error">{formik.errors.email}</div>
+        <div className="error">{formik.errors.requestor}</div>
+
         <div className="ticket-field">Email:</div>
         <input
           type="email"
@@ -63,7 +63,8 @@ function ModifyTicketForm() {
           value={formik.values.email}
           onChange={formik.handleChange}
         />
-        <div className="error">{formik.errors.phone}</div>
+        <div className="error">{formik.errors.email}</div>
+
         <div className="ticket-field">Phone:</div>
         <input
           type="text"
@@ -72,10 +73,10 @@ function ModifyTicketForm() {
           value={formik.values.phone}
           onChange={formik.handleChange}
         />
-        <div className="error">{formik.errors.priority}</div>
+        <div className="error">{formik.errors.phone}</div>
+
         <div className="ticket-field">Priority:</div>
         <select
-          type="text"
           id="priority"
           autoComplete="off"
           value={formik.values.priority}
@@ -85,7 +86,8 @@ function ModifyTicketForm() {
           <option value="medium">medium</option>
           <option value="high">high</option>
         </select>
-        <div className="error">{formik.errors.title}</div>
+        <div className="error">{formik.errors.priority}</div>
+
         <div className="ticket-field">Title:</div>
         <input
           type="text"
@@ -94,7 +96,8 @@ function ModifyTicketForm() {
           value={formik.values.title}
           onChange={formik.handleChange}
         />
-        <div className="error">{formik.errors.description}</div>
+        <div className="error">{formik.errors.title}</div>
+
         <div className="ticket-field">Description:</div>
         <textarea
           id="description"
@@ -104,6 +107,8 @@ function ModifyTicketForm() {
           rows="4"
           cols="50"
         />
+        <div className="error">{formik.errors.description}</div>
+
         <div className="button-container">
           <button className="button" type="submit">Update Ticket</button>
           <button className="button" onClick={() => navigate(`/ticket/${ticket.id}`, { state: { ticket: ticket, user: user } })}>Cancel</button>
@@ -114,3 +119,4 @@ function ModifyTicketForm() {
 }
 
 export default ModifyTicketForm
+

@@ -20,7 +20,6 @@ function App() {
       fetch("/queues")
       .then((response) => {
         response.json().then((queues) => setQueues(queues))
-        console.log(queues)
       })
     )
   }, [])

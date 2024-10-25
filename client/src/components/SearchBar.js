@@ -13,6 +13,7 @@ function SearchBar( {queues} ) {
   const formSchema = yup.object().shape({
     searchTerm: yup
       .string()
+      .required("Must enter a search term")
       .max(64, "Search term must be less than 64 characters")
   })
 
@@ -23,17 +24,14 @@ function SearchBar( {queues} ) {
     onSubmit: (values) => {
       const searchTerm = values.searchTerm.toLowerCase()
 
-      // Fetch tickets matching the search term
       fetch(`/tickets/search?q=${searchTerm}`)
         .then(response => {
           if (response.ok) { response.json()
             .then(data => {
               if (data.length === 0) {
-                setErrors(["No matching tickets found"])
                 setFilteredTickets([])
               } else {
-                setErrors([]) // Clear errors
-                setFilteredTickets(data) // Update filtered tickets
+                setFilteredTickets(data)
               }
             })
           }
@@ -41,19 +39,15 @@ function SearchBar( {queues} ) {
     }
   })
 
-  // Function to clear search results
   const clearSearch = () => {
     setFilteredTickets([])
-    formik.setFieldValue('searchTerm', '') // Clear the input field
-    setErrors([]) // Clear any existing errors
+    formik.setFieldValue('searchTerm', '')
   }
 
   return (
     <div className="search-box">
       <nav id="searchbar">
         <form onSubmit={formik.handleSubmit}>
-          {formik.errors.searchTerm && <div className="error">{formik.errors.searchTerm}</div>}
-
           <input
             type="text"
             id="searchTerm"
@@ -62,19 +56,15 @@ function SearchBar( {queues} ) {
             value={formik.values.searchTerm}
             onChange={formik.handleChange}
           />
-
           <button className="button" type="submit">
             Search
           </button>
-
           <button className="button clear-search" type="button" onClick={clearSearch}>
             Clear
           </button>
-
-          {errors.length > 0 && <div className="alert">{errors[0]}</div>}
+          {formik.errors.searchTerm ? <div className="error">{formik.errors.searchTerm}</div> : <div className="spacer-small"></div>}
         </form>
       </nav>
-
       {filteredTickets.length > 0 && (
         <div className="ticket-list">
           <div className="search-results">Search Results</div>
@@ -83,12 +73,10 @@ function SearchBar( {queues} ) {
             <div className="ticket-cell">Title</div>
             <div className="ticket-cell">Matching Attribute</div>
           </div>
-
           {filteredTickets.map(ticket => {
             const searchTerm = formik.values.searchTerm.toLowerCase()
             let matchingAttribute = ""
 
-            // Determine the matching attribute
             if (ticket.title.toLowerCase().includes(searchTerm)) {
               matchingAttribute = `Title: ${ticket.title}`
             } else if (ticket.requestor.username.toLowerCase().includes(searchTerm)) {

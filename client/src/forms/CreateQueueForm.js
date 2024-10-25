@@ -16,7 +16,6 @@ function CreateQueueForm({ onClose }) {
         initialValues: { name: "" },
         validationSchema: formSchema,
         onSubmit: (values) => {
-            console.log(values)
             fetch(`/queues`, {
             method: "POST",
             headers: { "content-Type": "application/json" },

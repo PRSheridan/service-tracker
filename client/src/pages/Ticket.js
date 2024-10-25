@@ -39,6 +39,10 @@ function Ticket() {
 
   // Fetch images for the ticket
   function getImages() {
+    if (ticket.images.length === 0) {
+      return
+    }
+  
     fetch(`/images/${ticket.id}`)
       .then(response => response.blob())
       .then(blob => {
@@ -52,8 +56,7 @@ function Ticket() {
             file.async("blob").then(content => {
               const objectUrl = URL.createObjectURL(content)
               return { url: objectUrl, name: relativePath }
-            })
-          )
+            }))
         })
         return Promise.all(imagePromises)
       })

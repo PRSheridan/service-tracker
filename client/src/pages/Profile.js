@@ -14,7 +14,7 @@ function Profile() {
         if (response.ok) { return response.json() }
       }).then(updated_user => setUser(updated_user))
         .finally(() => setIsLoading(false))
-  }, [user.id])
+  }, [user.id, showQueueForm])
 
   function deleteQueue(queue_id) {
     fetch(`/user/queue/${queue_id}`, {

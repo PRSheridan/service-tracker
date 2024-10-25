@@ -20,7 +20,6 @@ function QueueForm({ queues, ticket, onClose }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values, null, 1),
       }).then((response) => {
-        console.log(queues)
         if (response.ok) { onClose() } 
         else { response.json().then((err) => setErrors(err.errors)) }
       })

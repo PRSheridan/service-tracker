@@ -16,7 +16,6 @@ function CreateTagForm({ onClose }) {
         initialValues: { name: "" },
         validationSchema: formSchema,
         onSubmit: (values) => {
-            console.log(values)
             fetch(`/tags`, {
             method: "POST",
             headers: { "content-Type": "application/json" },

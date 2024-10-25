@@ -38,7 +38,6 @@ function ModifyUserForm() {
     <div className="new-form">
       <h2>Modify account details:</h2>
       <form onSubmit={formik.handleSubmit}>
-        <div className="error">{formik.errors.username}</div>
         <div className="user-field">Username:</div>
         <input
           type="text"
@@ -47,7 +46,8 @@ function ModifyUserForm() {
           value={formik.values.username}
           onChange={formik.handleChange}
         />
-        <div className="error">{formik.errors.email}</div>
+        <div className="error">{formik.errors.username}</div>
+
         <div className="user-field">Email:</div>
         <input
           type="email"
@@ -56,7 +56,8 @@ function ModifyUserForm() {
           value={formik.values.email}
           onChange={formik.handleChange}
         />
-        <div className="error">{formik.errors.phone}</div>
+        <div className="error">{formik.errors.email}</div>
+
         <div className="user-field">Phone:</div>
         <input
           type="text"
@@ -65,6 +66,8 @@ function ModifyUserForm() {
           value={formik.values.phone}
           onChange={formik.handleChange}
         />
+        <div className="error">{formik.errors.phone}</div>
+
         <div className="button-container">
           <button className="button" type="submit">Update user</button>
           <button className="button" onClick={() => navigate(`/profile`)}>Cancel</button>

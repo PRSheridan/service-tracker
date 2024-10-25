@@ -189,6 +189,7 @@ class Tickets(Resource):
 
     def post(self):
         data = request.get_json()
+
         requestor = User.query.filter(User.username == data['requestor']).one_or_none()
         if requestor is None:
             return {'error': 'Requestor not found'}, 404
@@ -196,10 +197,10 @@ class Tickets(Resource):
         queue = Queue.query.filter(Queue.name == data['queue']).one_or_none()
         if queue is None:
             return {'error': 'Queue not found'}, 404
-
+        
         try:
             new_ticket = Ticket(
-                requestor=requestor.id,
+                requestor_id=requestor.id,
                 date=datetime.datetime.utcnow(),
                 email=data['email'],
                 phone=data['phone'],
