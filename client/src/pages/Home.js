@@ -28,18 +28,17 @@ function Home() {
         </div>
       ) : (
         <UserContext.Provider value={user}>
-            <SearchBar queues={queues}/>
             {user.role == "client" ? (
             <div className="client-tickets">
-              <div className="queue-display-name">{user.username}'s tickets:</div>
               {data.length > 0 ? (
-                    <QueueDisplay userTickets={data} />
+                <QueueDisplay userTickets={data} />
               ) : (
                 <div>No tickets to display.</div>
               )}
             </div>
           ) : (
             <div className="admin-queues">
+              <SearchBar queues={queues}/>
               {data.length > 0 ? (
                 data.map((queue) => (
                     <QueueDisplay key={queue.name} queue={queue} queues={queues} />

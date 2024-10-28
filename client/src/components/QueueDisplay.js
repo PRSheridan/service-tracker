@@ -29,7 +29,8 @@ function QueueDisplay({ userTickets, queue, queues}) {
 
     return (
         <div className="ticket-list">
-            {queue ? <div className="display-name">{queue.name}</div> : null}
+            {queue ? <div className="display-name">{queue.name}</div> : 
+                     <div className="display-name">{user.username}'s tickets</div>}
             <div className="queue-display-header">
                 <div className="ticket-column">Ticket ID</div>
                 <div className="ticket-column">Title</div>
