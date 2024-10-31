@@ -55,10 +55,10 @@ class Login(Resource):
     def post(self):
         json = request.get_json()
         username = json.get('username')
-        #password = json.get('password')
+        password = json.get('password')
         user = User.query.filter(User.username == username).first()
 
-        if user: #and user.authenticate(password):
+        if user and user.authenticate(password):
             session['user_id'] = user.id
             return make_response(user.to_dict(), 200)
         
@@ -91,14 +91,14 @@ class UserByID(Resource):
         user = User.query.filter(User.id == user_id).one_or_none()
         if user is None:
             return {'error': 'User not found'}, 404
-        
+
         data = request.get_json()
         password = data.get('password')
         passwordConfirm = data.get('passwordConfirm')
         passwordCurrent = data.get('passwordCurrent')
 
-        #if user.authenticate(passwordCurrent):
-        #    return {'error': 'Incorrect current password'}, 401
+        if not user.authenticate(passwordCurrent):
+            return {'error': 'Incorrect current password'}, 401
 
         if password and password != passwordConfirm:
             return {'error': 'Passwords do not match'}, 401
@@ -107,22 +107,20 @@ class UserByID(Resource):
             user.username = data.get('username', user.username)
             user.email = data.get('email', user.email)
             user.phone = data.get('phone', user.phone)
-            
+
             if 'role' in data:
                 if user.role != 'admin':
                     return {'error': 'Only admins can change roles'}, 403
                 user.role = data.get('role', user.role)
-            
-            # Update password if provided
-            #if password:
-            #   user.password_hash = password
-            
+
+            if password:
+                user.password_hash = password
+
             db.session.commit()
             return user.to_dict(), 200
-        
+
         except Exception as e:
             return {'error': str(e)}, 400
-
 
     def delete(self, user_id):
         user = User.query.filter(User.id == user_id).one_or_none()

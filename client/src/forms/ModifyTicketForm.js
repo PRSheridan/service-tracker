@@ -17,6 +17,7 @@ function ModifyTicketForm() {
     title: yup.string().required("Title is required"),
     description: yup.string().required("Description is required"),
     priority: yup.string().required("Priority is required"),
+    status: yup.string().required("Status is required"),
   })
 
   const formik = useFormik({
@@ -27,6 +28,7 @@ function ModifyTicketForm() {
       title: ticket.title,
       description: ticket.description,
       priority: ticket.priority,
+      status: ticket.status
     },
     validationSchema: formSchema,
     onSubmit: (values) => {
@@ -87,6 +89,19 @@ function ModifyTicketForm() {
           <option value="high">high</option>
         </select>
         <div className="error">{formik.errors.priority}</div>
+
+        <div className="ticket-field">Status:</div>
+        <select
+          id="status"
+          autoComplete="off"
+          value={formik.values.status}
+          onChange={formik.handleChange}
+        >
+          <option value="new">new</option>
+          <option value="in-progress">in-progress</option>
+          <option value="closed">closed</option>
+        </select>
+        <div className="error">{formik.errors.status}</div>
 
         <div className="ticket-field">Title:</div>
         <input
