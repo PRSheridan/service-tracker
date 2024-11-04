@@ -97,7 +97,7 @@ class UserByID(Resource):
         passwordConfirm = data.get('passwordConfirm')
         passwordCurrent = data.get('passwordCurrent')
 
-        if not user.authenticate(passwordCurrent):
+        if password and not user.authenticate(passwordCurrent):
             return {'error': 'Incorrect current password'}, 401
 
         if password and password != passwordConfirm:
