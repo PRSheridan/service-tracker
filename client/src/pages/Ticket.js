@@ -35,7 +35,7 @@ function Ticket() {
 
   useEffect(() => {
     getImages()
-  }, [])
+  }, [ticket])
 
   // Fetch images for the ticket
   function getImages() {
